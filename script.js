@@ -395,4 +395,133 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       // Aqui segue o fluxo normal de edição da OS
     });
+
+  // --- GRÁFICO DE LUCROS ---
+  // Exemplo de dados dinâmicos (pode ser substituído depois)
+  const chartData = {
+    anos: [2025],
+    meses: [
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
+    ],
+    valoresPorAno: {
+      2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    meta: 0, // valor de meta para linha de referência (zerado)
+  };
+
+  function fillYearFilter() {
+    const yearFilter = document.getElementById('yearFilter');
+    yearFilter.innerHTML = '';
+    chartData.anos.forEach((ano) => {
+      const opt = document.createElement('option');
+      opt.value = ano;
+      opt.textContent = ano;
+      yearFilter.appendChild(opt);
+    });
+  }
+
+  function fillChartYAxis(maxValue) {
+    const yAxis = document.getElementById('chartYAxis');
+    yAxis.innerHTML = '';
+    // Exemplo: 5 divisões
+    for (let i = 5; i >= 0; i--) {
+      const valor = Math.round((maxValue * i) / 5);
+      const span = document.createElement('span');
+      span.textContent =
+        'R$ ' + valor.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+      yAxis.appendChild(span);
+    }
+  }
+
+  function fillChartXAxis() {
+    const xAxis = document.getElementById('chartXAxis');
+    xAxis.innerHTML = '';
+    chartData.meses.forEach((mes) => {
+      const span = document.createElement('span');
+      span.textContent = mes;
+      xAxis.appendChild(span);
+    });
+  }
+
+  function fillChartReferenceLines() {
+    const refLines = document.getElementById('chartReferenceLines');
+    refLines.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const div = document.createElement('div');
+      div.className = 'border-b border-dark-base border-opacity-30 h-0';
+      refLines.appendChild(div);
+    }
+  }
+
+  function fillChartBars(ano) {
+    const barsContainer = document.getElementById('chartBarsContainer');
+    // Remove barras antigas (exceto linhas de referência e meta)
+    barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
+    const valores = chartData.valoresPorAno[ano] || [];
+    const max = Math.max(...valores, chartData.meta || 0);
+    valores.forEach((valor, idx) => {
+      const bar = document.createElement('div');
+      bar.className = 'flex-1 flex items-end justify-center';
+      const barInner = document.createElement('div');
+      barInner.className =
+        'w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
+      const altura = max > 0 ? (valor / max) * 80 + 10 : 0; // altura relativa (10% a 90%)
+      barInner.style.setProperty('--target-height', altura + '%');
+      barInner.style.height = '0%';
+      bar.appendChild(barInner);
+      barsContainer.appendChild(bar);
+    });
+    // Atualiza linha de meta
+    const goalLine = document.getElementById('chartGoalLine');
+    if (goalLine) {
+      const meta = chartData.meta || 0;
+      if (meta > 0 && max > 0) {
+        const metaPercent = (meta / max) * 80 + 10;
+        goalLine.style.top = 100 - metaPercent + '%';
+        goalLine.style.display = '';
+      } else {
+        goalLine.style.display = 'none';
+      }
+    }
+  }
+
+  function updateChart(ano) {
+    const valores = chartData.valoresPorAno[ano] || [];
+    const max = Math.max(...valores, chartData.meta || 0);
+    fillChartYAxis(max);
+    fillChartXAxis();
+    fillChartReferenceLines();
+    fillChartBars(ano);
+    // Preencher total do período
+    const total = valores.reduce((acc, v) => acc + v, 0);
+    const totalSpan = document.getElementById('chartTotalPeriodo');
+    if (totalSpan) {
+      totalSpan.textContent =
+        total === 0
+          ? '-'
+          : 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+  }
+
+  // Inicialização do gráfico
+  if (document.getElementById('yearFilter')) {
+    fillYearFilter();
+    updateChart(chartData.anos[0]);
+    document
+      .getElementById('yearFilter')
+      .addEventListener('change', function () {
+        updateChart(this.value);
+      });
+  }
 });
