@@ -551,4 +551,41 @@ document.addEventListener('DOMContentLoaded', function () {
         updateChart(this.value);
       });
   }
+
+  // --- Exclusão de Chamado (OS) ---
+  const btnDeletarChamado = document.getElementById('btnDeletarChamado');
+  if (btnDeletarChamado) {
+    btnDeletarChamado.addEventListener('click', function () {
+      if (
+        !confirm(
+          'Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita.'
+        )
+      )
+        return;
+      // Recupera o ID do chamado a partir do modal (exemplo: pode ser salvo em um atributo data-id)
+      const osId = btnDeletarChamado.getAttribute('data-id');
+      if (!osId) {
+        alert('ID do chamado não encontrado.');
+        return;
+      }
+      fetch('chamados_delete.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: osId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert('Chamado excluído com sucesso!');
+            closeAllModals();
+            // Atualize a tabela de OS aqui, se necessário
+          } else {
+            alert(
+              'Erro ao excluir chamado: ' + (data.error || 'Erro desconhecido.')
+            );
+          }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
+  }
 });
