@@ -402,11 +402,11 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     // Preencher status
     const statusList = [
-      'Aguardando',
-      'Em andamento',
-      'Aguardando peça',
+      'Diagnosticando',
+      'Aguardando Cliente',
+      'Aguardando Peça',
+      'Aguardando Retirada',
       'Concluído',
-      'Entregue',
     ];
     const selectStatus = document.getElementById('selectStatus');
     if (selectStatus) {
@@ -1186,29 +1186,93 @@ document.addEventListener('DOMContentLoaded', function () {
         osTableBody.innerHTML = '';
         if (data && Array.isArray(data) && data.length > 0) {
           data.forEach((os) => {
+            // Formatação de datas
+            function formatarDataHora(dataStr) {
+              if (!dataStr) return '-';
+              const partes = dataStr.split(' ');
+              const data = partes[0] ? partes[0].split('-') : [];
+              const hora = partes[1] ? partes[1].slice(0, 5) : '';
+              if (data.length === 3) {
+                return `${data[2]}/${data[1]}/${data[0]}${
+                  hora ? ' ' + hora : ''
+                }`;
+              }
+              return '-';
+            }
+            // Status colorido
+            function getStatusBadge(status) {
+              let cor = '#64748b';
+              let bg = '#e5e7eb';
+              let texto = status;
+              if (!status) return '';
+              switch (status) {
+                case 'Diagnosticando':
+                  cor = '#2563eb';
+                  bg = '#dbeafe';
+                  break;
+                case 'Aguardando Cliente':
+                  cor = '#f59e42';
+                  bg = '#fef3c7';
+                  break;
+                case 'Aguardando Peça':
+                  cor = '#a21caf';
+                  bg = '#f3e8ff';
+                  break;
+                case 'Aguardando Retirada':
+                  cor = '#64748b';
+                  bg = '#e5e7eb';
+                  break;
+                case 'Concluído':
+                  cor = '#22c55e';
+                  bg = '#dcfce7';
+                  break;
+              }
+              return `<span style="display:inline-block;padding:2px 16px;border-radius:999px;font-weight:600;font-size:0.95em;background:${bg};color:${cor};min-width:120px;text-align:center;">${texto}</span>`;
+            }
+            // Valor
+            let valor = '-';
+            let valorNum =
+              os.valor_total !== undefined && os.valor_total !== null
+                ? os.valor_total
+                : os.valor;
+            if (
+              valorNum !== undefined &&
+              valorNum !== null &&
+              !isNaN(parseFloat(valorNum))
+            ) {
+              valor =
+                'R$ ' +
+                parseFloat(valorNum).toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                });
+            }
+            // Montar linha
             const tr = document.createElement('tr');
             tr.innerHTML = `
-              <td class="px-4 py-2 text-gray-200">${os.id}</td>
-              <td class="px-4 py-2 text-gray-200">${os.numero_os || '-'}</td>
-              <td class="px-4 py-2 text-gray-200">${os.cliente}</td>
-              <td class="px-4 py-2 text-gray-200">${os.item}</td>
-              <td class="px-4 py-2 text-gray-200">${
-                os.data_entrada ? formatarData(os.data_entrada) : '-'
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+                os.id
               }</td>
-              <td class="px-4 py-2 text-gray-200">${
-                os.data_atualizacao ? formatarData(os.data_atualizacao) : '-'
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+                os.numero_os || '-'
               }</td>
-              <td class="px-4 py-2 text-gray-200">${os.status}</td>
-              <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
-                os.valor
-              ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-              <td class="px-4 py-2 text-center">
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+                os.cliente
+              }</td>
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+                os.item
+              }</td>
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${formatarDataHora(
+                os.data_entrada
+              )}</td>
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${formatarDataHora(
+                os.data_atualizacao
+              )}</td>
+              <td class="px-6 py-3">${getStatusBadge(os.status)}</td>
+              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${valor}</td>
+              <td class="px-6 py-3 text-center">
                 <button class="btn-editar-os text-accent-blue hover:underline mr-2" data-id="${
                   os.id
                 }">Editar</button>
-                <button class="btn-excluir-os text-status-red hover:underline" data-id="${
-                  os.id
-                }">Excluir</button>
               </td>
             `;
             osTableBody.appendChild(tr);
@@ -1217,15 +1281,9 @@ document.addEventListener('DOMContentLoaded', function () {
           osTableBody.innerHTML =
             '<tr><td colspan="9" class="text-center text-gray-400 py-4">Nenhuma OS cadastrada.</td></tr>';
         }
-        // Adicionar eventos aos botões de ação (editar/excluir)
         document.querySelectorAll('.btn-editar-os').forEach((btn) => {
           btn.addEventListener('click', function () {
             abrirModalEditarOS(this.getAttribute('data-id'));
-          });
-        });
-        document.querySelectorAll('.btn-excluir-os').forEach((btn) => {
-          btn.addEventListener('click', function () {
-            excluirChamado(this.getAttribute('data-id'));
           });
         });
       })
@@ -1268,7 +1326,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editExitDate').value = os.data_saida || '';
         document.getElementById('editDefectSolution').value =
           os.defeito_solucao || '';
-        // Preencher selects de serviço e status
+        // Preencher selects de serviço
         fetch('servicos_select.php')
           .then((res) => res.json())
           .then((servicos) => {
@@ -1280,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', function () {
             opt.value = '';
             opt.textContent = 'Selecione um serviço';
             selectServicoEditar.appendChild(opt);
-            servicos.forEach((s, idx) => {
+            servicos.forEach((s) => {
               const o = document.createElement('option');
               o.value = s.id;
               o.textContent = s.nome;
@@ -1288,13 +1346,13 @@ document.addEventListener('DOMContentLoaded', function () {
               selectServicoEditar.appendChild(o);
             });
           });
-        // Status
+        // Status corretos
         const statusList = [
-          'Aguardando',
-          'Em andamento',
-          'Aguardando peça',
+          'Diagnosticando',
+          'Aguardando Cliente',
+          'Aguardando Peça',
+          'Aguardando Retirada',
           'Concluído',
-          'Entregue',
         ];
         const selectStatusEditar =
           document.getElementById('selectStatusEditar');
@@ -1307,9 +1365,14 @@ document.addEventListener('DOMContentLoaded', function () {
           selectStatusEditar.appendChild(o);
         });
         // Valor total
-        document.getElementById('valorTotalEditar').value = parseFloat(
-          os.valor_total
-        ).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        document.getElementById('valorTotalEditar').value =
+          os.valor_total !== undefined &&
+          os.valor_total !== null &&
+          !isNaN(parseFloat(os.valor_total))
+            ? parseFloat(os.valor_total).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+              })
+            : '';
         // Tipo recebimento
         document.getElementById('selectRecebimentoEditar').value =
           os.tipo_recebimento || 'comissao';
