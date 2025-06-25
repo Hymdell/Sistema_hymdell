@@ -163,4 +163,166 @@ document.addEventListener('DOMContentLoaded', function () {
         valorInput.value = '';
       }
     });
+
+  // Função para aplicar máscara de telefone
+  function maskPhone(input) {
+    input.addEventListener('input', function () {
+      let v = input.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 10) {
+        input.value = v.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      } else if (v.length > 6) {
+        input.value = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
+      } else if (v.length > 2) {
+        input.value = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+      } else {
+        input.value = v;
+      }
+    });
+  }
+
+  // Validação dos campos obrigatórios e tipos
+  function validateOSForm(isEdit = false) {
+    const prefix = isEdit ? 'edit' : '';
+    const errors = [];
+    const clientName = document
+      .getElementById(prefix + 'ClientName')
+      .value.trim();
+    const attendant = document
+      .getElementById(prefix + 'Attendant')
+      .value.trim();
+    const item = document.getElementById(prefix + 'Item').value.trim();
+    const entryDate = document.getElementById(prefix + 'EntryDate').value;
+    const defectSolution = document
+      .getElementById(prefix + 'DefectSolution')
+      .value.trim();
+    const osNumber = document.getElementById(prefix + 'OsNumber').value.trim();
+    const phone = document.getElementById(prefix + 'Phone').value.trim();
+
+    if (osNumber && !/^\d+$/.test(osNumber)) {
+      errors.push('Número da OS deve conter apenas números.');
+    }
+    if (!clientName) {
+      errors.push('Nome do Cliente é obrigatório.');
+    }
+    if (!attendant) {
+      errors.push('Atendente é obrigatório.');
+    }
+    if (phone && !/^\(\d{2}\) \d{4,5}-\d{4}$/.test(phone)) {
+      errors.push('Telefone inválido. Use o formato (99) 99999-9999.');
+    }
+    if (!item) {
+      errors.push('Item é obrigatório.');
+    }
+    if (!entryDate) {
+      errors.push('Data de Entrada é obrigatória.');
+    }
+    if (!defectSolution) {
+      errors.push('Defeito/Solução é obrigatório.');
+    }
+    return errors;
+  }
+
+  // Exibir erros na tela
+  function showFormErrors(errors, isEdit = false) {
+    let errorDiv = document.getElementById(
+      isEdit ? 'editOsFormErrors' : 'osFormErrors'
+    );
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.id = isEdit ? 'editOsFormErrors' : 'osFormErrors';
+      errorDiv.className = 'mb-2 text-red-400 text-sm';
+      const form = document.querySelector(
+        isEdit ? '#modalEditOS .modal-content' : '#modalAddOS .modal-content'
+      );
+      form.insertBefore(errorDiv, form.firstChild);
+    }
+    errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
+  }
+  function clearFormErrors(isEdit = false) {
+    const errorDiv = document.getElementById(
+      isEdit ? 'editOsFormErrors' : 'osFormErrors'
+    );
+    if (errorDiv) errorDiv.innerHTML = '';
+  }
+
+  // Máscara de telefone
+  maskPhone(document.getElementById('phone'));
+  maskPhone(document.getElementById('editPhone'));
+
+  // Exemplo de preenchimento dinâmico dos selects
+  const servicos = [
+    { nome: 'Formatação', valor: 150.0 },
+    { nome: 'Troca de fonte', valor: 250.0 },
+    { nome: 'Troca de tela', valor: 350.0 },
+    { nome: 'Limpeza', valor: 120.0 },
+    { nome: 'Reparo de placa', valor: 200.0 },
+  ];
+  const statusList = [
+    'Aguardando',
+    'Em andamento',
+    'Aguardando peça',
+    'Concluído',
+    'Entregue',
+  ];
+  function fillSelectOptions() {
+    const selects = [
+      { id: 'servicoSelect', arr: servicos, isServico: true },
+      { id: 'editServicoSelect', arr: servicos, isServico: true },
+      { id: 'statusSelect', arr: statusList },
+      { id: 'editStatusSelect', arr: statusList },
+    ];
+    selects.forEach((sel) => {
+      const select = document.getElementById(sel.id);
+      if (!select) return;
+      select.innerHTML = '';
+      if (sel.isServico) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Selecione um serviço';
+        select.appendChild(opt);
+        sel.arr.forEach((s) => {
+          const o = document.createElement('option');
+          o.value = s.valor;
+          o.textContent = s.nome;
+          select.appendChild(o);
+        });
+      } else {
+        sel.arr.forEach((s) => {
+          const o = document.createElement('option');
+          o.value = s;
+          o.textContent = s;
+          select.appendChild(o);
+        });
+      }
+    });
+  }
+  fillSelectOptions();
+
+  // Exemplo de uso na submissão do formulário (criação)
+  document
+    .querySelector('#modalAddOS .bg-accent-blue')
+    .addEventListener('click', function (e) {
+      clearFormErrors();
+      const errors = validateOSForm(false);
+      if (errors.length) {
+        showFormErrors(errors, false);
+        e.preventDefault();
+        return;
+      }
+      // Aqui segue o fluxo normal de criação da OS
+    });
+  // Edição
+  document
+    .querySelector('#modalEditOS .bg-accent-blue')
+    .addEventListener('click', function (e) {
+      clearFormErrors(true);
+      const errors = validateOSForm(true);
+      if (errors.length) {
+        showFormErrors(errors, true);
+        e.preventDefault();
+        return;
+      }
+      // Aqui segue o fluxo normal de edição da OS
+    });
 });

@@ -143,42 +143,42 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Número da OS (opcional)</label>
-                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa">
+                            <input type="text" id="osNumber" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa" inputmode="numeric" pattern="[0-9]*">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
-                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="clientName" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Atendente</label>
-                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="attendant" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Telefone</label>
-                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="phone" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="(99) 99999-9999">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Item</label>
-                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="item" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Data de Entrada</label>
-                            <input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="date" id="entryDate" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Data Saída</label>
-                            <input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="date" id="exitDate" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
                         </div>
                         
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-400 mb-1">Defeito/Solução</label>
-                            <textarea class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20"></textarea>
+                            <textarea id="defectSolution" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20" required></textarea>
                         </div>
                         
                         <div>
@@ -198,7 +198,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Status</label>
-                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="statusSelect">
+                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="statusSelect" required>
                                 <!-- Opções serão inseridas via JavaScript -->
                             </select>
                         </div>
@@ -231,32 +231,32 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Número da OS (opcional)</label>
-                            <input type="text" value="1025" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa">
+                            <input type="text" value="1025" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa" inputmode="numeric" pattern="[0-9]*">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
-                            <input type="text" id="editClientName" value="João Silva" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="editClientName" value="João Silva" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Atendente</label>
-                            <input type="text" value="Carlos Técnico" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="editAttendant" value="Carlos Técnico" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Telefone</label>
-                            <input type="text" value="(11) 98765-4321" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="editPhone" value="(11) 98765-4321" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="(99) 99999-9999">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Item</label>
-                            <input type="text" value="Notebook Dell" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="editItem" value="Notebook Dell" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Data de Entrada</label>
-                            <input type="date" value="2023-05-15" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="date" id="editEntryDate" value="2023-05-15" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
@@ -266,12 +266,12 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Data Saída</label>
-                            <input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="date" id="editExitDate" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
                         </div>
                         
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-400 mb-1">Defeito/Solução</label>
-                            <textarea class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20">Notebook não liga. Verificar fonte e bateria.</textarea>
+                            <textarea id="editDefectSolution" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20" required>Notebook não liga. Verificar fonte e bateria.</textarea>
                         </div>
                         
                         <div>
@@ -291,7 +291,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Status</label>
-                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="editStatusSelect">
+                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="editStatusSelect" required>
                                 <!-- Opções serão inseridas via JavaScript -->
                             </select>
                         </div>
