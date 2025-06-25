@@ -945,4 +945,413 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroMes.disabled = true;
     atualizarVisaoGrafico();
   }
+
+  // --- CRUD DE METAS (AJAX) ---
+  function buscarMeta(ano, mes) {
+    return fetch('meta_select.php')
+      .then((res) => res.json())
+      .then((metas) => {
+        if (!Array.isArray(metas)) return null;
+        return metas.find(
+          (m) => Number(m.ano) === Number(ano) && Number(m.mes) === Number(mes)
+        );
+      });
+  }
+
+  function inserirOuAtualizarMeta(ano, mes, valor) {
+    // Tenta buscar meta existente
+    return buscarMeta(ano, mes).then((meta) => {
+      if (meta) {
+        // Atualizar
+        const formData = new FormData();
+        formData.append('id', meta.id);
+        formData.append('valor', valor);
+        return fetch('meta_update.php', {
+          method: 'POST',
+          body: formData,
+        }).then((res) => res.json());
+      } else {
+        // Inserir
+        const formData = new FormData();
+        formData.append('ano', ano);
+        formData.append('mes', mes);
+        formData.append('valor', valor);
+        return fetch('meta_insert.php', {
+          method: 'POST',
+          body: formData,
+        }).then((res) => res.json());
+      }
+    });
+  }
+
+  function deletarMeta(id) {
+    const formData = new FormData();
+    formData.append('id', id);
+    return fetch('meta_delete.php', {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json());
+  }
+
+  // --- Integração com o modal de meta ---
+  if (btnEditGoal) {
+    btnEditGoal.addEventListener('click', () => {
+      openModal('modalEditGoal');
+      fillMetaAno();
+      const mesAtual = new Date().getMonth() + 1;
+      const selectMes = document.getElementById('inputMetaMes');
+      const selectAno = document.getElementById('inputMetaAno');
+      if (selectMes) selectMes.value = mesAtual;
+      // Buscar meta existente e preencher campo
+      buscarMeta(selectAno.value, selectMes.value).then((meta) => {
+        document.getElementById('inputMetaMensal').value = meta
+          ? Number(meta.valor).toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            })
+          : '';
+        document
+          .getElementById('inputMetaMensal')
+          .setAttribute('data-meta-id', meta ? meta.id : '');
+      });
+      // Atualizar campo ao trocar ano/mês
+      selectAno.addEventListener('change', function () {
+        buscarMeta(this.value, selectMes.value).then((meta) => {
+          document.getElementById('inputMetaMensal').value = meta
+            ? Number(meta.valor).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+              })
+            : '';
+          document
+            .getElementById('inputMetaMensal')
+            .setAttribute('data-meta-id', meta ? meta.id : '');
+        });
+      });
+      selectMes.addEventListener('change', function () {
+        buscarMeta(selectAno.value, this.value).then((meta) => {
+          document.getElementById('inputMetaMensal').value = meta
+            ? Number(meta.valor).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+              })
+            : '';
+          document
+            .getElementById('inputMetaMensal')
+            .setAttribute('data-meta-id', meta ? meta.id : '');
+        });
+      });
+    });
+  }
+
+  if (btnSalvarMeta) {
+    btnSalvarMeta.addEventListener('click', function () {
+      const ano = document.getElementById('inputMetaAno').value;
+      const mes = document.getElementById('inputMetaMes').value;
+      let mensal = document.getElementById('inputMetaMensal').value;
+      mensal = mensal.replace(/\./g, '').replace(',', '.');
+      if (!ano || !mes || !mensal || isNaN(Number(mensal))) {
+        alert('Preencha todos os campos corretamente.');
+        return;
+      }
+      inserirOuAtualizarMeta(ano, mes, mensal).then((res) => {
+        if (res.success) {
+          alert('Meta salva com sucesso!');
+          closeAllModals();
+        } else {
+          alert('Erro ao salvar meta: ' + (res.error || 'Erro desconhecido.'));
+        }
+      });
+    });
+  }
+
+  // --- INSERÇÃO DE SERVIÇO VIA AJAX ---
+  const btnSalvarServico = document.querySelector(
+    '#modalAddService .bg-accent-amber'
+  );
+  if (btnSalvarServico) {
+    btnSalvarServico.addEventListener('click', function (e) {
+      clearServiceFormErrors();
+      const errors = validateServiceForm();
+      if (errors.length) {
+        showServiceFormErrors(errors);
+        e.preventDefault();
+        return;
+      }
+      const nome = serviceName.value.trim();
+      const valor = servicePrice.value.replace(/\./g, '').replace(',', '.');
+      const comissao = serviceCommission.value
+        .replace(/\./g, '')
+        .replace(',', '.');
+      const formData = new FormData();
+      formData.append('nome', nome);
+      formData.append('valor', valor);
+      formData.append('comissao', comissao);
+      fetch('servicos_insert.php', {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert('Serviço adicionado com sucesso!');
+            closeAllModals();
+            // Limpar formulário
+            serviceName.value = '';
+            servicePrice.value = '';
+            serviceCommission.value = '';
+            // Atualizar selects e tabela de serviços
+            carregarServicos();
+            fillSelectOptions();
+          } else {
+            alert(
+              'Erro ao adicionar serviço: ' +
+                (data.error || 'Erro desconhecido.')
+            );
+          }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
+  }
+
+  // --- LISTAGEM DINÂMICA DE CHAMADOS/OS ---
+  function carregarChamados() {
+    fetch('chamados_select.php')
+      .then((res) => res.json())
+      .then((data) => {
+        const osTableBody = document.getElementById('osTableBody');
+        osTableBody.innerHTML = '';
+        if (data && Array.isArray(data) && data.length > 0) {
+          data.forEach((os) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="px-4 py-2 text-gray-200">${os.id}</td>
+              <td class="px-4 py-2 text-gray-200">${os.numero_os || '-'}</td>
+              <td class="px-4 py-2 text-gray-200">${os.cliente}</td>
+              <td class="px-4 py-2 text-gray-200">${os.item}</td>
+              <td class="px-4 py-2 text-gray-200">${
+                os.data_entrada ? formatarData(os.data_entrada) : '-'
+              }</td>
+              <td class="px-4 py-2 text-gray-200">${
+                os.data_atualizacao ? formatarData(os.data_atualizacao) : '-'
+              }</td>
+              <td class="px-4 py-2 text-gray-200">${os.status}</td>
+              <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                os.valor
+              ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+              <td class="px-4 py-2 text-center">
+                <button class="btn-editar-os text-accent-blue hover:underline mr-2" data-id="${
+                  os.id
+                }">Editar</button>
+                <button class="btn-excluir-os text-status-red hover:underline" data-id="${
+                  os.id
+                }">Excluir</button>
+              </td>
+            `;
+            osTableBody.appendChild(tr);
+          });
+        } else {
+          osTableBody.innerHTML =
+            '<tr><td colspan="9" class="text-center text-gray-400 py-4">Nenhuma OS cadastrada.</td></tr>';
+        }
+        // Adicionar eventos aos botões de ação (editar/excluir)
+        document.querySelectorAll('.btn-editar-os').forEach((btn) => {
+          btn.addEventListener('click', function () {
+            abrirModalEditarOS(this.getAttribute('data-id'));
+          });
+        });
+        document.querySelectorAll('.btn-excluir-os').forEach((btn) => {
+          btn.addEventListener('click', function () {
+            excluirChamado(this.getAttribute('data-id'));
+          });
+        });
+      })
+      .catch(() => {
+        const osTableBody = document.getElementById('osTableBody');
+        osTableBody.innerHTML =
+          '<tr><td colspan="9" class="text-center text-red-400 py-4">Erro ao carregar OS.</td></tr>';
+      });
+  }
+
+  // Função utilitária para formatar datas (YYYY-MM-DD para DD/MM/YYYY)
+  function formatarData(dataStr) {
+    if (!dataStr) return '';
+    const [ano, mes, dia] = dataStr.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  // Chamar ao carregar a página
+  carregarChamados();
+
+  // --- EDIÇÃO E EXCLUSÃO DE OS VIA AJAX ---
+  let osEditandoId = null;
+
+  // Abrir modal de edição e preencher campos
+  function abrirModalEditarOS(id) {
+    fetch('chamados_select.php')
+      .then((res) => res.json())
+      .then((data) => {
+        const os = data.find((c) => String(c.id) === String(id));
+        if (!os) return alert('OS não encontrada!');
+        osEditandoId = os.id;
+        document.getElementById('editOsNumber').textContent = os.numero_os
+          ? `#${os.numero_os}`
+          : '';
+        document.getElementById('editClientName').value = os.cliente || '';
+        document.getElementById('editAttendant').value = os.atendente || '';
+        document.getElementById('editPhone').value = os.telefone || '';
+        document.getElementById('editItem').value = os.item || '';
+        document.getElementById('editEntryDate').value = os.data_entrada || '';
+        document.getElementById('editExitDate').value = os.data_saida || '';
+        document.getElementById('editDefectSolution').value =
+          os.defeito_solucao || '';
+        // Preencher selects de serviço e status
+        fetch('servicos_select.php')
+          .then((res) => res.json())
+          .then((servicos) => {
+            const selectServicoEditar = document.getElementById(
+              'selectServicoEditar'
+            );
+            selectServicoEditar.innerHTML = '';
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'Selecione um serviço';
+            selectServicoEditar.appendChild(opt);
+            servicos.forEach((s, idx) => {
+              const o = document.createElement('option');
+              o.value = s.id;
+              o.textContent = s.nome;
+              if (String(s.id) === String(os.servico_id)) o.selected = true;
+              selectServicoEditar.appendChild(o);
+            });
+          });
+        // Status
+        const statusList = [
+          'Aguardando',
+          'Em andamento',
+          'Aguardando peça',
+          'Concluído',
+          'Entregue',
+        ];
+        const selectStatusEditar =
+          document.getElementById('selectStatusEditar');
+        selectStatusEditar.innerHTML = '';
+        statusList.forEach((s) => {
+          const o = document.createElement('option');
+          o.value = s;
+          o.textContent = s;
+          if (s === os.status) o.selected = true;
+          selectStatusEditar.appendChild(o);
+        });
+        // Valor total
+        document.getElementById('valorTotalEditar').value = parseFloat(
+          os.valor_total
+        ).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        // Tipo recebimento
+        document.getElementById('selectRecebimentoEditar').value =
+          os.tipo_recebimento || 'comissao';
+        openModal('modalEditOS');
+        // Salvar ID para exclusão
+        document
+          .getElementById('btnDeletarChamado')
+          .setAttribute('data-id', os.id);
+      });
+  }
+
+  // Salvar edição de OS
+  const btnSalvarEdicaoOS = document.querySelector(
+    '#modalEditOS .bg-accent-blue'
+  );
+  if (btnSalvarEdicaoOS) {
+    btnSalvarEdicaoOS.addEventListener('click', function (e) {
+      clearFormErrors(true);
+      const errors = validateOSForm(true);
+      if (errors.length) {
+        showFormErrors(errors, true);
+        e.preventDefault();
+        return;
+      }
+      // Coletar dados do formulário de edição
+      const numero_os = document
+        .getElementById('editOsNumber')
+        .textContent.replace('#', '')
+        .trim();
+      const cliente = document.getElementById('editClientName').value.trim();
+      const atendente = document.getElementById('editAttendant').value.trim();
+      const telefone = document.getElementById('editPhone').value.trim();
+      const item = document.getElementById('editItem').value.trim();
+      const data_entrada = document.getElementById('editEntryDate').value;
+      const data_saida = document.getElementById('editExitDate').value;
+      const defeito_solucao = document
+        .getElementById('editDefectSolution')
+        .value.trim();
+      const servico_id = document.getElementById('selectServicoEditar').value;
+      const tipo_recebimento = document.getElementById(
+        'selectRecebimentoEditar'
+      ).value;
+      const valor_total = document
+        .getElementById('valorTotalEditar')
+        .value.replace(/\./g, '')
+        .replace(',', '.');
+      const status = document.getElementById('selectStatusEditar').value;
+      const payload = {
+        id: osEditandoId,
+        numero_os,
+        cliente,
+        atendente,
+        telefone,
+        item,
+        data_entrada,
+        data_saida,
+        defeito_solucao,
+        servico_id,
+        tipo_recebimento,
+        valor_total,
+        status,
+      };
+      fetch('chamados_update.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert('Ordem de Serviço atualizada com sucesso!');
+            closeAllModals();
+            carregarChamados();
+          } else {
+            alert(
+              'Erro ao atualizar OS: ' + (data.error || 'Erro desconhecido.')
+            );
+          }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
+  }
+
+  // Excluir OS
+  function excluirChamado(id) {
+    if (
+      !confirm(
+        'Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita.'
+      )
+    )
+      return;
+    fetch('chamados_delete.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          alert('Chamado excluído com sucesso!');
+          closeAllModals();
+          carregarChamados();
+        } else {
+          alert(
+            'Erro ao excluir chamado: ' + (data.error || 'Erro desconhecido.')
+          );
+        }
+      })
+      .catch(() => alert('Erro de comunicação com o servidor.'));
+  }
 });
