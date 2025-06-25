@@ -225,21 +225,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function validateOSForm(isEdit = false) {
     const prefix = isEdit ? 'edit' : '';
     const errors = [];
-    const clientName = document
-      .getElementById(prefix + 'ClientName')
-      .value.trim();
-    const attendant = document
-      .getElementById(prefix + 'Attendant')
-      .value.trim();
-    const item = document.getElementById(prefix + 'Item').value.trim();
-    const entryDate = document.getElementById(prefix + 'EntryDate').value;
-    const defectSolution = document
-      .getElementById(prefix + 'DefectSolution')
-      .value.trim();
-    const osNumber = document.getElementById(prefix + 'OsNumber').value.trim();
-    const phone = document.getElementById(prefix + 'Phone').value.trim();
+    const getValue = (id) => {
+      const el = document.getElementById(prefix + id);
+      return el ? el.value.trim() : '';
+    };
+    const clientName = getValue('clientName');
+    const attendant = getValue('attendant');
+    const item = getValue('item');
+    const entryDate = getValue('entryDate');
+    const defectSolution = getValue('defectSolution');
+    const osNumber = getValue('osNumber');
+    const phone = getValue('phone');
 
-    if (osNumber && !/^\d+$/.test(osNumber)) {
+    if (osNumber && !/^[\d]+$/.test(osNumber)) {
       errors.push('Número da OS deve conter apenas números.');
     }
     if (!clientName) {
@@ -360,21 +358,102 @@ document.addEventListener('DOMContentLoaded', function () {
       // Aqui segue o fluxo normal de adição de serviço
     });
 
-  // Exemplo de preenchimento dinâmico dos selects
-  const servicos = [
-    { nome: 'Formatação', valor: 150.0 },
-    { nome: 'Troca de fonte', valor: 250.0 },
-    { nome: 'Troca de tela', valor: 350.0 },
-    { nome: 'Limpeza', valor: 120.0 },
-    { nome: 'Reparo de placa', valor: 200.0 },
-  ];
-  const statusList = [
-    'Aguardando',
-    'Em andamento',
-    'Aguardando peça',
-    'Concluído',
-    'Entregue',
-  ];
+  // --- Preencher selects de serviço com ID como value ---
+  function fillSelectOptions() {
+    fetch('servicos_select.php')
+      .then((res) => res.json())
+      .then((servicos) => {
+        // Preencher selectServico (adicionar OS)
+        const selectServico = document.getElementById('selectServico');
+        if (selectServico) {
+          selectServico.innerHTML = '';
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'Selecione um serviço';
+          selectServico.appendChild(opt);
+          servicos.forEach((s) => {
+            const o = document.createElement('option');
+            o.value = s.id;
+            o.textContent = s.nome;
+            o.setAttribute('data-valor', s.valor);
+            selectServico.appendChild(o);
+          });
+        }
+        // Preencher selectServicoEditar (editar OS)
+        const selectServicoEditar = document.getElementById(
+          'selectServicoEditar'
+        );
+        if (selectServicoEditar) {
+          selectServicoEditar.innerHTML = '';
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'Selecione um serviço';
+          selectServicoEditar.appendChild(opt);
+          servicos.forEach((s) => {
+            const o = document.createElement('option');
+            o.value = s.id;
+            o.textContent = s.nome;
+            o.setAttribute('data-valor', s.valor);
+            selectServicoEditar.appendChild(o);
+          });
+        }
+      });
+    // Preencher status
+    const statusList = [
+      'Aguardando',
+      'Em andamento',
+      'Aguardando peça',
+      'Concluído',
+      'Entregue',
+    ];
+    const selectStatus = document.getElementById('selectStatus');
+    if (selectStatus) {
+      selectStatus.innerHTML = '';
+      statusList.forEach((s) => {
+        const o = document.createElement('option');
+        o.value = s;
+        o.textContent = s;
+        selectStatus.appendChild(o);
+      });
+    }
+    const selectStatusEditar = document.getElementById('selectStatusEditar');
+    if (selectStatusEditar) {
+      selectStatusEditar.innerHTML = '';
+      statusList.forEach((s) => {
+        const o = document.createElement('option');
+        o.value = s;
+        o.textContent = s;
+        selectStatusEditar.appendChild(o);
+      });
+    }
+  }
+  fillSelectOptions();
+
+  // Atualizar valor total ao selecionar serviço (usando data-valor)
+  document
+    .getElementById('selectServico')
+    .addEventListener('change', function () {
+      const valorInput = document.getElementById('valorTotal');
+      const selected = this.options[this.selectedIndex];
+      const valor = selected.getAttribute('data-valor');
+      if (valor) {
+        valorInput.value = parseFloat(valor).toFixed(2).replace('.', ',');
+      } else {
+        valorInput.value = '';
+      }
+    });
+  document
+    .getElementById('selectServicoEditar')
+    .addEventListener('change', function () {
+      const valorInput = document.getElementById('valorTotalEditar');
+      const selected = this.options[this.selectedIndex];
+      const valor = selected.getAttribute('data-valor');
+      if (valor) {
+        valorInput.value = parseFloat(valor).toFixed(2).replace('.', ',');
+      } else {
+        valorInput.value = '';
+      }
+    });
 
   // --- GRÁFICO DE LUCROS ---
   // Exemplo de dados dinâmicos (pode ser substituído depois)
@@ -399,41 +478,6 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     meta: 0, // valor de meta para linha de referência (zerado)
   };
-
-  // Atualizar IDs para português
-  function fillSelectOptions() {
-    const selects = [
-      { id: 'selectServico', arr: servicos, isServico: true },
-      { id: 'selectServicoEditar', arr: servicos, isServico: true },
-      { id: 'selectStatus', arr: statusList },
-      { id: 'selectStatusEditar', arr: statusList },
-    ];
-    selects.forEach((sel) => {
-      const select = document.getElementById(sel.id);
-      if (!select) return;
-      select.innerHTML = '';
-      if (sel.isServico) {
-        const opt = document.createElement('option');
-        opt.value = '';
-        opt.textContent = 'Selecione um serviço';
-        select.appendChild(opt);
-        sel.arr.forEach((s) => {
-          const o = document.createElement('option');
-          o.value = s.valor;
-          o.textContent = s.nome;
-          select.appendChild(o);
-        });
-      } else {
-        sel.arr.forEach((s) => {
-          const o = document.createElement('option');
-          o.value = s;
-          o.textContent = s;
-          select.appendChild(o);
-        });
-      }
-    });
-  }
-  fillSelectOptions();
 
   // Gráfico: atualizar para filtroAno
   function fillYearFilter() {
@@ -1353,5 +1397,70 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
       .catch(() => alert('Erro de comunicação com o servidor.'));
+  }
+
+  // --- ADIÇÃO DE OS (CHAMADO) ---
+  const btnSalvarOS = document.querySelector('#modalAddOS .bg-accent-blue');
+  if (btnSalvarOS) {
+    btnSalvarOS.addEventListener('click', function (e) {
+      clearFormErrors();
+      const errors = validateOSForm();
+      if (errors.length) {
+        showFormErrors(errors);
+        e.preventDefault();
+        return;
+      }
+      // Coletar dados do formulário de adição
+      const numero_os = document.getElementById('osNumber').value.trim();
+      const cliente = document.getElementById('clientName').value.trim();
+      const atendente = document.getElementById('attendant').value.trim();
+      const telefone = document.getElementById('phone').value.trim();
+      const item = document.getElementById('item').value.trim();
+      const data_entrada = document.getElementById('entryDate').value;
+      const data_saida = document.getElementById('exitDate').value;
+      const defeito_solucao = document
+        .getElementById('defectSolution')
+        .value.trim();
+      const servico_id = document.getElementById('selectServico').value;
+      const tipo_recebimento =
+        document.getElementById('selectRecebimento').value;
+      const valor_total = document
+        .getElementById('valorTotal')
+        .value.replace(/\./g, '')
+        .replace(',', '.');
+      const status = document.getElementById('selectStatus').value;
+      const payload = {
+        numero_os,
+        cliente,
+        atendente,
+        telefone,
+        item,
+        data_entrada,
+        data_saida,
+        defeito_solucao,
+        servico_id,
+        tipo_recebimento,
+        valor_total,
+        status,
+      };
+      fetch('chamados_insert.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert('Ordem de Serviço adicionada com sucesso!');
+            closeAllModals();
+            carregarChamados();
+          } else {
+            alert(
+              'Erro ao adicionar OS: ' + (data.error || 'Erro desconhecido.')
+            );
+          }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
   }
 });
