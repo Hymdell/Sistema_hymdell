@@ -407,11 +407,34 @@
                 
                 <div class="p-6">
                     <div class="mb-6 flex justify-between items-center">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Filtrar por ano</label>
-                            <select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="filtroAno">
-                                <!-- Opções de ano serão inseridas via JavaScript -->
-                            </select>
+                        <div class="flex space-x-4 items-end">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Filtrar por ano</label>
+                                <select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="filtroAno">
+                                    <!-- Opções de ano serão inseridas via JavaScript -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+                                <select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="filtroMes">
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-1">Visualização</label>
+                                <button id="toggleVisaoGrafico" class="rounded-md px-3 py-2 text-sm bg-accent-blue text-dark-base font-semibold focus:outline-none transition-colors">Anual</button>
+                            </div>
                         </div>
                         <div class="flex space-x-4">
                             <div class="flex items-center">

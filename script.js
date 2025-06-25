@@ -819,4 +819,130 @@ document.addEventListener('DOMContentLoaded', function () {
       closeAllModals();
     });
   }
+
+  // --- SUPORTE AO FILTRO DE MÊS NO GRÁFICO ---
+  function getDiasNoMes(ano, mes) {
+    return new Date(ano, mes, 0).getDate();
+  }
+
+  // Exemplo de dados diários (substitua por dados reais do backend futuramente)
+  const chartDataDiario = {
+    // chartDataDiario[ano][mes] = [valorDia1, valorDia2, ...]
+    2025: {
+      6: Array.from({ length: 30 }, (_, i) => Math.floor(Math.random() * 500)), // Junho 2025
+      7: Array.from({ length: 31 }, (_, i) => Math.floor(Math.random() * 500)), // Julho 2025
+    },
+  };
+
+  function fillChartXAxisDias(ano, mes) {
+    const xAxis = document.getElementById('chartXAxis');
+    xAxis.innerHTML = '';
+    const dias = getDiasNoMes(ano, mes);
+    for (let d = 1; d <= dias; d++) {
+      const span = document.createElement('span');
+      span.textContent = d;
+      xAxis.appendChild(span);
+    }
+  }
+
+  function fillChartBarsDias(ano, mes) {
+    const barsContainer = document.getElementById('chartBarsContainer');
+    barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
+    const valores = (chartDataDiario[ano] && chartDataDiario[ano][mes]) || [];
+    const max = Math.max(...valores, chartData.meta || 0);
+    valores.forEach((valor, idx) => {
+      const bar = document.createElement('div');
+      bar.className = 'flex-1 flex items-end justify-center';
+      const barInner = document.createElement('div');
+      barInner.className =
+        'w-4 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
+      const altura = max > 0 ? (valor / max) * 80 + 10 : 0;
+      barInner.style.setProperty('--target-height', altura + '%');
+      barInner.style.height = '0%';
+      bar.appendChild(barInner);
+      barsContainer.appendChild(bar);
+    });
+    // Atualiza linha de meta (opcional)
+    const goalLine = document.getElementById('chartGoalLine');
+    if (goalLine) {
+      const meta = chartData.meta || 0;
+      if (meta > 0 && max > 0) {
+        const metaPercent = (meta / max) * 80 + 10;
+        goalLine.style.top = 100 - metaPercent + '%';
+        goalLine.style.display = '';
+      } else {
+        goalLine.style.display = 'none';
+      }
+    }
+  }
+
+  function updateChartDiario(ano, mes) {
+    const valores = (chartDataDiario[ano] && chartDataDiario[ano][mes]) || [];
+    const max = Math.max(...valores, chartData.meta || 0);
+    fillChartYAxis(max);
+    fillChartXAxisDias(ano, mes);
+    fillChartReferenceLines();
+    fillChartBarsDias(ano, mes);
+    // Preencher total do período
+    const total = valores.reduce((acc, v) => acc + v, 0);
+    const totalSpan = document.getElementById('chartTotalPeriodo');
+    if (totalSpan) {
+      totalSpan.textContent =
+        total === 0
+          ? '-'
+          : 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+  }
+
+  // Inicialização do gráfico diário
+  if (
+    document.getElementById('filtroAno') &&
+    document.getElementById('filtroMes')
+  ) {
+    const filtroAno = document.getElementById('filtroAno');
+    const filtroMes = document.getElementById('filtroMes');
+    filtroMes.value = (new Date().getMonth() + 1).toString();
+    filtroAno.addEventListener('change', function () {
+      updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
+    });
+    filtroMes.addEventListener('change', function () {
+      updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
+    });
+    // Exibe gráfico diário ao abrir
+    updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
+  }
+
+  // --- TOGGLE ENTRE VISUALIZAÇÃO ANUAL E MENSAL ---
+  let visaoGrafico = 'anual'; // 'anual' ou 'mensal'
+  const toggleVisaoGrafico = document.getElementById('toggleVisaoGrafico');
+  if (
+    toggleVisaoGrafico &&
+    document.getElementById('filtroAno') &&
+    document.getElementById('filtroMes')
+  ) {
+    const filtroAno = document.getElementById('filtroAno');
+    const filtroMes = document.getElementById('filtroMes');
+    function atualizarVisaoGrafico() {
+      if (visaoGrafico === 'anual') {
+        toggleVisaoGrafico.textContent = 'Anual';
+        filtroMes.disabled = true;
+        updateChart(Number(filtroAno.value));
+      } else {
+        toggleVisaoGrafico.textContent = 'Mensal';
+        filtroMes.disabled = false;
+        updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
+      }
+    }
+    toggleVisaoGrafico.addEventListener('click', function () {
+      visaoGrafico = visaoGrafico === 'anual' ? 'mensal' : 'anual';
+      atualizarVisaoGrafico();
+    });
+    filtroAno.addEventListener('change', atualizarVisaoGrafico);
+    filtroMes.addEventListener('change', function () {
+      if (visaoGrafico === 'mensal') atualizarVisaoGrafico();
+    });
+    // Inicialização: começa em anual
+    filtroMes.disabled = true;
+    atualizarVisaoGrafico();
+  }
 });
