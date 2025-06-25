@@ -164,6 +164,38 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
+  // Atualizar valor total SEMPRE com valor integral do serviço (criação)
+  function atualizarValorTotalOS() {
+    const servicoSelect = document.getElementById('servicoSelect');
+    const valorInput = document.getElementById('valorTotal');
+    let valorBase = parseFloat(servicoSelect.value);
+    if (isNaN(valorBase)) {
+      valorInput.value = '';
+      return;
+    }
+    valorInput.value = valorBase.toFixed(2).replace('.', ',');
+  }
+  document
+    .getElementById('servicoSelect')
+    .addEventListener('change', atualizarValorTotalOS);
+  // O tipo de recebimento não altera o valor exibido
+
+  // Atualizar valor total SEMPRE com valor integral do serviço (edição)
+  function atualizarValorTotalEditOS() {
+    const servicoSelect = document.getElementById('editServicoSelect');
+    const valorInput = document.getElementById('editValorTotal');
+    let valorBase = parseFloat(servicoSelect.value);
+    if (isNaN(valorBase)) {
+      valorInput.value = '';
+      return;
+    }
+    valorInput.value = valorBase.toFixed(2).replace('.', ',');
+  }
+  document
+    .getElementById('editServicoSelect')
+    .addEventListener('change', atualizarValorTotalEditOS);
+  // O tipo de recebimento não altera o valor exibido
+
   // Função para aplicar máscara de telefone
   function maskPhone(input) {
     input.addEventListener('input', function () {
