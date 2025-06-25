@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Alternar ano do gráfico
-  document.getElementById('yearFilter').addEventListener('change', function () {
+  document.getElementById('filtroAno').addEventListener('change', function () {
     const bars = document.querySelectorAll('.chart-bar');
     const randomHeights = [
       Math.floor(Math.random() * 60) + 20 + '%',
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Atualizar valor com base no serviço selecionado
   document
-    .getElementById('servicoSelect')
+    .getElementById('selectServico')
     .addEventListener('change', function () {
       const valorInput = document.getElementById('valorTotal');
       const valorSelecionado = this.value;
@@ -148,9 +148,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Atualizar valor com base no serviço selecionado (modal de edição)
   document
-    .getElementById('editServicoSelect')
+    .getElementById('selectServicoEditar')
     .addEventListener('change', function () {
-      const valorInput = document.getElementById('editValorTotal');
+      const valorInput = document.getElementById('valorTotalEditar');
       const valorSelecionado = this.value;
 
       if (valorSelecionado) {
@@ -166,9 +166,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Atualizar valor total SEMPRE com valor integral do serviço (criação)
   function atualizarValorTotalOS() {
-    const servicoSelect = document.getElementById('servicoSelect');
+    const selectServico = document.getElementById('selectServico');
     const valorInput = document.getElementById('valorTotal');
-    let valorBase = parseFloat(servicoSelect.value);
+    let valorBase = parseFloat(selectServico.value);
     if (isNaN(valorBase)) {
       valorInput.value = '';
       return;
@@ -176,15 +176,15 @@ document.addEventListener('DOMContentLoaded', function () {
     valorInput.value = valorBase.toFixed(2).replace('.', ',');
   }
   document
-    .getElementById('servicoSelect')
+    .getElementById('selectServico')
     .addEventListener('change', atualizarValorTotalOS);
   // O tipo de recebimento não altera o valor exibido
 
   // Atualizar valor total SEMPRE com valor integral do serviço (edição)
   function atualizarValorTotalEditOS() {
-    const servicoSelect = document.getElementById('editServicoSelect');
-    const valorInput = document.getElementById('editValorTotal');
-    let valorBase = parseFloat(servicoSelect.value);
+    const selectServicoEditar = document.getElementById('selectServicoEditar');
+    const valorInput = document.getElementById('valorTotalEditar');
+    let valorBase = parseFloat(selectServicoEditar.value);
     if (isNaN(valorBase)) {
       valorInput.value = '';
       return;
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
     valorInput.value = valorBase.toFixed(2).replace('.', ',');
   }
   document
-    .getElementById('editServicoSelect')
+    .getElementById('selectServicoEditar')
     .addEventListener('change', atualizarValorTotalEditOS);
   // O tipo de recebimento não altera o valor exibido
 
@@ -367,12 +367,13 @@ document.addEventListener('DOMContentLoaded', function () {
     'Concluído',
     'Entregue',
   ];
+  // Atualizar IDs para português
   function fillSelectOptions() {
     const selects = [
-      { id: 'servicoSelect', arr: servicos, isServico: true },
-      { id: 'editServicoSelect', arr: servicos, isServico: true },
-      { id: 'statusSelect', arr: statusList },
-      { id: 'editStatusSelect', arr: statusList },
+      { id: 'selectServico', arr: servicos, isServico: true },
+      { id: 'selectServicoEditar', arr: servicos, isServico: true },
+      { id: 'selectStatus', arr: statusList },
+      { id: 'selectStatusEditar', arr: statusList },
     ];
     selects.forEach((sel) => {
       const select = document.getElementById(sel.id);
@@ -401,32 +402,26 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   fillSelectOptions();
 
-  // Exemplo de uso na submissão do formulário (criação)
-  document
-    .querySelector('#modalAddOS .bg-accent-blue')
-    .addEventListener('click', function (e) {
-      clearFormErrors();
-      const errors = validateOSForm(false);
-      if (errors.length) {
-        showFormErrors(errors, false);
-        e.preventDefault();
-        return;
-      }
-      // Aqui segue o fluxo normal de criação da OS
+  // Gráfico: atualizar para filtroAno
+  function fillYearFilter() {
+    const filtroAno = document.getElementById('filtroAno');
+    filtroAno.innerHTML = '';
+    chartData.anos.forEach((ano) => {
+      const opt = document.createElement('option');
+      opt.value = ano;
+      opt.textContent = ano;
+      filtroAno.appendChild(opt);
     });
-  // Edição
-  document
-    .querySelector('#modalEditOS .bg-accent-blue')
-    .addEventListener('click', function (e) {
-      clearFormErrors(true);
-      const errors = validateOSForm(true);
-      if (errors.length) {
-        showFormErrors(errors, true);
-        e.preventDefault();
-        return;
-      }
-      // Aqui segue o fluxo normal de edição da OS
-    });
+  }
+  if (document.getElementById('filtroAno')) {
+    fillYearFilter();
+    updateChart(chartData.anos[0]);
+    document
+      .getElementById('filtroAno')
+      .addEventListener('change', function () {
+        updateChart(this.value);
+      });
+  }
 
   // --- GRÁFICO DE LUCROS ---
   // Exemplo de dados dinâmicos (pode ser substituído depois)
@@ -453,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   function fillYearFilter() {
-    const yearFilter = document.getElementById('yearFilter');
+    const yearFilter = document.getElementById('filtroAno');
     yearFilter.innerHTML = '';
     chartData.anos.forEach((ano) => {
       const opt = document.createElement('option');
@@ -547,11 +542,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Inicialização do gráfico
-  if (document.getElementById('yearFilter')) {
+  if (document.getElementById('filtroAno')) {
     fillYearFilter();
     updateChart(chartData.anos[0]);
     document
-      .getElementById('yearFilter')
+      .getElementById('filtroAno')
       .addEventListener('change', function () {
         updateChart(this.value);
       });

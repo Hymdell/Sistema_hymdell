@@ -185,13 +185,13 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Serviço Prestado</label>
-                            <select id="servicoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <select id="selectServico" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
                                 <!-- Opções serão inseridas via JavaScript -->
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Tipo de Recebimento</label>
-                            <select id="recebimentoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <select id="selectRecebimento" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
                                 <option value="comissao">Comissão (metade)</option>
                                 <option value="integral">Valor Integral</option>
                             </select>
@@ -207,7 +207,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Status</label>
-                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="statusSelect" required>
+                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="selectStatus" required>
                                 <!-- Opções serão inseridas via JavaScript -->
                             </select>
                         </div>
@@ -285,13 +285,13 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Serviço Prestado</label>
-                            <select id="editServicoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <select id="selectServicoEditar" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
                                 <!-- Opções serão inseridas via JavaScript -->
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Tipo de Recebimento</label>
-                            <select id="editRecebimentoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <select id="selectRecebimentoEditar" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
                                 <option value="comissao">Comissão (metade)</option>
                                 <option value="integral">Valor Integral</option>
                             </select>
@@ -301,13 +301,13 @@
                             <label class="block text-sm font-medium text-gray-400 mb-1">Valor Total</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2 text-gray-500">R$</span>
-                                <input type="text" id="editValorTotal" value="250,00" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly="">
+                                <input type="text" id="valorTotalEditar" value="250,00" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly="">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Status</label>
-                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="editStatusSelect" required>
+                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" id="selectStatusEditar" required>
                                 <!-- Opções serão inseridas via JavaScript -->
                             </select>
                         </div>
@@ -388,7 +388,7 @@
                     <div class="mb-6 flex justify-between items-center">
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Filtrar por ano</label>
-                            <select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="yearFilter">
+                            <select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="filtroAno">
                                 <!-- Opções de ano serão inseridas via JavaScript -->
                             </select>
                         </div>
