@@ -1,0 +1,14 @@
+<?php
+// meta_delete.php - Remove uma meta
+require 'config.php';
+
+$id = $_POST['id'] ?? '';
+
+if ($id) {
+    $stmt = $pdo->prepare('DELETE FROM Meta WHERE id=?');
+    $ok = $stmt->execute([$id]);
+    echo json_encode(['success' => $ok]);
+} else {
+    echo json_encode(['success' => false, 'error' => 'ID não informado']);
+}
+?>
