@@ -98,43 +98,8 @@
                             <th class="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-dark-base">
-                        <tr class="os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30">
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">#1</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">1025</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">João Silva</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">Notebook Dell</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">15/05/2023</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                <span class="px-2 py-1 rounded-full text-xs bg-status-amber bg-opacity-20 text-status-amber">Em andamento</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">R$ 350,00</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
-                                <button class="edit-os-btn p-1.5 rounded-full hover:bg-dark-elevated transition-colors duration-200" data-os="1025">
-                                    <svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30">
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">#2</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">1026</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">Maria Oliveira</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">Smartphone Samsung</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">16/05/2023</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                <span class="px-2 py-1 rounded-full text-xs bg-status-green bg-opacity-20 text-status-green">Concluído</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">R$ 200,00</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
-                                <button class="edit-os-btn p-1.5 rounded-full hover:bg-dark-elevated transition-colors duration-200" data-os="1026">
-                                    <svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
+                    <tbody class="divide-y divide-dark-base" id="osTableBody">
+                        <!-- As linhas da tabela serão inseridas dinamicamente via JavaScript -->
                     </tbody>
                 </table>
                 
