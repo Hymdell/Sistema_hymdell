@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function () {
     modalEditOS: document.getElementById('modalEditOS'),
     modalAddService: document.getElementById('modalAddService'),
     modalCharts: document.getElementById('modalCharts'),
+    modalManageServices: document.getElementById('modalManageServices'),
+    modalEditService: document.getElementById('modalEditService'),
+    modalDeleteService: document.getElementById('modalDeleteService'),
   };
 
   // Botões para abrir modais
@@ -19,6 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
   document
     .getElementById('btnViewCharts')
     .addEventListener('click', () => openModal('modalCharts'));
+  document.getElementById('btnManageServices').addEventListener('click', () => {
+    openModal('modalManageServices');
+    carregarServicos();
+  });
 
   // Botões de edição de OS
   document.querySelectorAll('.edit-os-btn').forEach((button) => {
@@ -586,6 +593,178 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         })
         .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
+  }
+
+  // --- GERENCIAMENTO DE SERVIÇOS (LISTAR, EDITAR, EXCLUIR) ---
+  const btnManageServices = document.getElementById('btnManageServices');
+  const modalManageServices = document.getElementById('modalManageServices');
+  const servicesTableBody = document.getElementById('servicesTableBody');
+  const modalEditService = document.getElementById('modalEditService');
+  const modalDeleteService = document.getElementById('modalDeleteService');
+  let servicoEditandoId = null;
+  let servicoExcluindoId = null;
+
+  // Abrir modal de gerenciamento e listar serviços
+  if (btnManageServices) {
+    btnManageServices.addEventListener('click', function () {
+      openModal('modalManageServices');
+      carregarServicos();
+    });
+  }
+
+  // Função para carregar serviços via AJAX
+  function carregarServicos() {
+    fetch('servicos_select.php')
+      .then((res) => res.json())
+      .then((data) => {
+        servicesTableBody.innerHTML = '';
+        if (data && Array.isArray(data)) {
+          data.forEach((servico) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="px-4 py-2 text-gray-200">${servico.nome}</td>
+              <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                servico.valor
+              ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+              <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                servico.comissao
+              ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+              <td class="px-4 py-2 text-center">
+                <button class="btn-editar-servico text-accent-blue hover:underline mr-2" data-id="${
+                  servico.id
+                }" data-nome="${servico.nome}" data-valor="${
+              servico.valor
+            }" data-comissao="${servico.comissao}">Editar</button>
+                <button class="btn-excluir-servico text-status-red hover:underline" data-id="${
+                  servico.id
+                }">Excluir</button>
+              </td>
+            `;
+            servicesTableBody.appendChild(tr);
+          });
+        } else {
+          servicesTableBody.innerHTML =
+            '<tr><td colspan="4" class="text-center text-gray-400 py-4">Nenhum serviço cadastrado.</td></tr>';
+        }
+        // Adiciona eventos aos botões de ação
+        document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
+          btn.addEventListener('click', function () {
+            servicoEditandoId = this.getAttribute('data-id');
+            document.getElementById('editServiceName').value =
+              this.getAttribute('data-nome');
+            document.getElementById('editServicePrice').value = parseFloat(
+              this.getAttribute('data-valor')
+            ).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('editServiceCommission').value = parseFloat(
+              this.getAttribute('data-comissao')
+            ).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            openModal('modalEditService');
+          });
+        });
+        document.querySelectorAll('.btn-excluir-servico').forEach((btn) => {
+          btn.addEventListener('click', function () {
+            servicoExcluindoId = this.getAttribute('data-id');
+            openModal('modalDeleteService');
+          });
+        });
+      })
+      .catch(() => {
+        servicesTableBody.innerHTML =
+          '<tr><td colspan="4" class="text-center text-red-400 py-4">Erro ao carregar serviços.</td></tr>';
+      });
+  }
+
+  // Salvar edição de serviço
+  const btnSalvarEdicaoServico = document.getElementById(
+    'btnSalvarEdicaoServico'
+  );
+  if (btnSalvarEdicaoServico) {
+    btnSalvarEdicaoServico.addEventListener('click', function () {
+      const nome = document.getElementById('editServiceName').value.trim();
+      const valor = document
+        .getElementById('editServicePrice')
+        .value.replace('.', '')
+        .replace(',', '.');
+      const comissao = document
+        .getElementById('editServiceCommission')
+        .value.replace('.', '')
+        .replace(',', '.');
+      if (!nome || isNaN(parseFloat(valor)) || isNaN(parseFloat(comissao))) {
+        alert('Preencha todos os campos corretamente.');
+        return;
+      }
+      fetch('servicos_update.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: servicoEditandoId, nome, valor, comissao }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert('Serviço atualizado com sucesso!');
+            closeAllModals();
+            carregarServicos();
+          } else {
+            alert(
+              'Erro ao atualizar serviço: ' +
+                (data.error || 'Erro desconhecido.')
+            );
+          }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
+  }
+
+  // Confirmar exclusão de serviço
+  const btnConfirmarExcluirServico = document.getElementById(
+    'btnConfirmarExcluirServico'
+  );
+  if (btnConfirmarExcluirServico) {
+    btnConfirmarExcluirServico.addEventListener('click', function () {
+      if (!servicoExcluindoId) return;
+      fetch('servicos_delete.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: servicoExcluindoId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            alert('Serviço excluído com sucesso!');
+            closeAllModals();
+            carregarServicos();
+          } else {
+            alert(
+              'Erro ao excluir serviço: ' + (data.error || 'Erro desconhecido.')
+            );
+          }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+    });
+  }
+
+  // Máscara para edição de preço/comissão
+  const editServicePrice = document.getElementById('editServicePrice');
+  const editServiceCommission = document.getElementById(
+    'editServiceCommission'
+  );
+  if (editServicePrice) {
+    editServicePrice.addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '');
+      v = (parseInt(v, 10) / 100).toFixed(2) + '';
+      v = v.replace('.', ',');
+      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+      this.value = v;
+    });
+  }
+  if (editServiceCommission) {
+    editServiceCommission.addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '');
+      v = (parseInt(v, 10) / 100).toFixed(2) + '';
+      v = v.replace('.', ',');
+      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+      this.value = v;
     });
   }
 });
