@@ -250,6 +250,76 @@ document.addEventListener('DOMContentLoaded', function () {
   maskPhone(document.getElementById('phone'));
   maskPhone(document.getElementById('editPhone'));
 
+  // --- Adicionar Serviço: Validação e Comissão ---
+  function maskMoney(input) {
+    input.addEventListener('input', function () {
+      let v = input.value.replace(/\D/g, '');
+      v = (parseInt(v, 10) / 100).toFixed(2) + '';
+      v = v.replace('.', ',');
+      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+      input.value = v;
+    });
+  }
+  const serviceName = document.getElementById('serviceName');
+  const servicePrice = document.getElementById('servicePrice');
+  const serviceCommission = document.getElementById('serviceCommission');
+  const btnUpdateCommission = document.getElementById('btnUpdateCommission');
+
+  if (servicePrice) {
+    maskMoney(servicePrice);
+  }
+  if (btnUpdateCommission) {
+    btnUpdateCommission.addEventListener('click', function () {
+      let valor = servicePrice.value.replace(/\./g, '').replace(',', '.');
+      valor = parseFloat(valor);
+      if (!isNaN(valor)) {
+        const metade = (valor / 2).toFixed(2).replace('.', ',');
+        serviceCommission.value = metade;
+      } else {
+        serviceCommission.value = '';
+      }
+    });
+  }
+  // Validação do modal de serviço
+  function validateServiceForm() {
+    const errors = [];
+    const nome = serviceName ? serviceName.value.trim() : '';
+    const preco = servicePrice ? servicePrice.value.trim() : '';
+    if (!nome) errors.push('Nome do Serviço é obrigatório.');
+    if (!preco || isNaN(parseFloat(preco.replace('.', '').replace(',', '.'))))
+      errors.push(
+        'Preço Total do Serviço é obrigatório e deve ser um valor válido.'
+      );
+    return errors;
+  }
+  function showServiceFormErrors(errors) {
+    let errorDiv = document.getElementById('serviceFormErrors');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.id = 'serviceFormErrors';
+      errorDiv.className = 'mb-2 text-red-400 text-sm';
+      const form = document.querySelector('#modalAddService .p-6');
+      form.insertBefore(errorDiv, form.firstChild);
+    }
+    errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
+  }
+  function clearServiceFormErrors() {
+    const errorDiv = document.getElementById('serviceFormErrors');
+    if (errorDiv) errorDiv.innerHTML = '';
+  }
+  document
+    .querySelector('#modalAddService .bg-accent-amber')
+    .addEventListener('click', function (e) {
+      clearServiceFormErrors();
+      const errors = validateServiceForm();
+      if (errors.length) {
+        showServiceFormErrors(errors);
+        e.preventDefault();
+        return;
+      }
+      // Aqui segue o fluxo normal de adição de serviço
+    });
+
   // Exemplo de preenchimento dinâmico dos selects
   const servicos = [
     { nome: 'Formatação', valor: 150.0 },

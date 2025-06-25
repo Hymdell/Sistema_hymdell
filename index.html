@@ -324,22 +324,23 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Serviço</label>
-                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                            <input type="text" id="serviceName" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Preço Total do Serviço</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2 text-gray-500">R$</span>
-                                <input type="text" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none">
+                                <input type="text" id="servicePrice" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" required>
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Sua Parte (Comissão)</label>
-                            <div class="relative">
+                            <div class="relative flex items-center">
                                 <span class="absolute left-3 top-2 text-gray-500">R$</span>
-                                <input type="text" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none">
+                                <input type="text" id="serviceCommission" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly>
+                                <button type="button" id="btnUpdateCommission" class="ml-2 px-2 py-1 rounded bg-accent-blue text-dark-base text-xs hover:bg-opacity-80 transition-colors">Atualizar</button>
                             </div>
                         </div>
                     </div>
