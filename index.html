@@ -1,0 +1,1701 @@
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hymdell Manutenções</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-base': '#1A1A1D',
+                        'dark-surface': '#2C2C30',
+                        'dark-elevated': '#3A3A3F',
+                        'accent-blue': '#A3D5FF',
+                        'accent-amber': '#FFB84C',
+                        'status-green': '#4CAF50',
+                        'status-amber': '#FFB84C',
+                        'status-red': '#F44336',
+                    },
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1A1A1D;
+            background-image: 
+                linear-gradient(to right, rgba(60, 60, 65, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(60, 60, 65, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .dark-texture {
+            background-color: #2C2C30;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%233A3A3F' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+        }
+
+        .os-row:hover {
+            box-shadow: 0 0 0 1px #A3D5FF;
+            background-color: rgba(163, 213, 255, 0.05);
+        }
+
+        .chart-bar {
+            transition: height 1s ease-in-out;
+        }
+
+        .logo-icon {
+            filter: drop-shadow(0 0 3px rgba(163, 213, 255, 0.3));
+        }
+
+        .source-code-btn {
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .source-code-btn:hover {
+            opacity: 1;
+        }
+
+        /* Estilização para inputs */
+        input, select, textarea {
+            background-color: rgba(42, 42, 46, 0.8);
+            border: 1px solid #3A3A3F;
+            color: #e2e2e2;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #A3D5FF;
+            box-shadow: 0 0 0 2px rgba(163, 213, 255, 0.2);
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-slideUp {
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        /* Animação para as barras do gráfico */
+        @keyframes barGrow {
+            from { height: 0; }
+            to { height: var(--target-height); }
+        }
+        
+        .bar-animate {
+            animation: barGrow 1s ease-out forwards;
+        }
+
+        /* Ajuste para modais */
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1A1A1D;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3A3A3F;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A3D5FF;
+        }
+        
+        /* Código fonte */
+        .source-code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-16{bottom:4rem}.bottom-28{bottom:7rem}.bottom-4{bottom:1rem}.left-0{left:0px}.left-3{left:0.75rem}.right-0{right:0px}.right-4{right:1rem}.top-0{top:0px}.top-1\/3{top:33.333333%}.top-2{top:0.5rem}.top-2\.5{top:0.625rem}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-12{margin-left:3rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-2{margin-top:0.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-0{height:0px}.h-10{height:2.5rem}.h-20{height:5rem}.h-3{height:0.75rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-full{height:100%}.max-h-96{max-height:24rem}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-3{width:0.75rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-full{width:100%}.min-w-full{min-width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-6xl{max-width:72rem}.max-w-md{max-width:28rem}.flex-1{flex:1 1 0%}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.space-x-1 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.25rem * var(--tw-space-x-reverse));margin-left:calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-dark-base > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(26 26 29 / var(--tw-divide-opacity, 1))}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-t-sm{border-top-left-radius:0.125rem;border-top-right-radius:0.125rem}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-t-2{border-top-width:2px}.border-dashed{border-style:dashed}.border-accent-amber{--tw-border-opacity:1;border-color:rgb(255 184 76 / var(--tw-border-opacity, 1))}.border-dark-base{--tw-border-opacity:1;border-color:rgb(26 26 29 / var(--tw-border-opacity, 1))}.border-opacity-30{--tw-border-opacity:0.3}.border-opacity-50{--tw-border-opacity:0.5}.bg-accent-amber{--tw-bg-opacity:1;background-color:rgb(255 184 76 / var(--tw-bg-opacity, 1))}.bg-accent-blue{--tw-bg-opacity:1;background-color:rgb(163 213 255 / var(--tw-bg-opacity, 1))}.bg-dark-base{--tw-bg-opacity:1;background-color:rgb(26 26 29 / var(--tw-bg-opacity, 1))}.bg-dark-elevated{--tw-bg-opacity:1;background-color:rgb(58 58 63 / var(--tw-bg-opacity, 1))}.bg-status-amber{--tw-bg-opacity:1;background-color:rgb(255 184 76 / var(--tw-bg-opacity, 1))}.bg-status-green{--tw-bg-opacity:1;background-color:rgb(76 175 80 / var(--tw-bg-opacity, 1))}.bg-opacity-20{--tw-bg-opacity:0.2}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-opacity-80{--tw-bg-opacity:0.8}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pl-10{padding-left:2.5rem}.pl-8{padding-left:2rem}.pr-3{padding-right:0.75rem}.pr-4{padding-right:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tracking-wider{letter-spacing:0.05em}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-accent-amber{--tw-text-opacity:1;color:rgb(255 184 76 / var(--tw-text-opacity, 1))}.text-accent-blue{--tw-text-opacity:1;color:rgb(163 213 255 / var(--tw-text-opacity, 1))}.text-dark-base{--tw-text-opacity:1;color:rgb(26 26 29 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-status-amber{--tw-text-opacity:1;color:rgb(255 184 76 / var(--tw-text-opacity, 1))}.text-status-green{--tw-text-opacity:1;color:rgb(76 175 80 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-50{opacity:0.5}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:bg-dark-elevated:hover{--tw-bg-opacity:1;background-color:rgb(58 58 63 / var(--tw-bg-opacity, 1))}.hover\:bg-dark-surface:hover{--tw-bg-opacity:1;background-color:rgb(44 44 48 / var(--tw-bg-opacity, 1))}.hover\:bg-opacity-30:hover{--tw-bg-opacity:0.3}.hover\:bg-opacity-90:hover{--tw-bg-opacity:0.9}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 768px){.md\:col-span-2{grid-column:span 2 / span 2}.md\:mb-0{margin-bottom:0px}.md\:inline{display:inline}.md\:hidden{display:none}.md\:w-1\/3{width:33.333333%}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:justify-between{justify-content:space-between}.md\:space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.md\:space-y-0 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0px * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0px * var(--tw-space-y-reverse))}.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}}</style></head>
+<body class="text-gray-200 min-h-screen" style="overflow: hidden;">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Cabeçalho -->
+        <header class="flex flex-col md:flex-row justify-center md:justify-between items-center mb-8 animate-fadeIn">
+            <div class="flex items-center mb-4 md:mb-0">
+                <div class="mr-3">
+                    <svg class="w-10 h-10 logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 5L5 12.5V27.5L20 35L35 27.5V12.5L20 5Z" stroke="#A3D5FF" stroke-width="2"></path>
+                        <path d="M12 15H28M12 25H28M10 20H30M20 10V30" stroke="#A3D5FF" stroke-width="2" stroke-linecap="round"></path>
+                        <path d="M20 5L5 12.5V27.5L20 35L35 27.5V12.5L20 5Z" stroke="#FFB84C" stroke-width="1" stroke-opacity="0.5"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-semibold tracking-wider text-white">Hymdell Manutenções</h1>
+            </div>
+        </header>
+
+        <!-- Painel de Controle -->
+        <div class="dark-texture rounded-lg p-4 mb-6 shadow-lg animate-slideUp">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="w-full md:w-1/3 relative">
+                    <input type="text" placeholder="Buscar por OS, cliente, serviço..." class="w-full pl-10 pr-4 py-2 rounded-md text-sm focus:outline-none">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <button id="btnAddOS" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-1 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span class="hidden md:inline">Adicionar OS</span>
+                    </button>
+                    
+                    <button id="btnAddService" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-1 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span class="hidden md:inline">Adicionar Serviço</span>
+                    </button>
+                    
+                    <button id="btnViewCharts" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-1 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span class="hidden md:inline">Ver Gráficos</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Conteúdo (Tabela de OS) -->
+        <div class="dark-texture rounded-lg shadow-lg overflow-hidden animate-slideUp">
+            <div class="overflow-x-auto">
+                <div class="p-4 bg-dark-elevated border-b border-dark-base">
+                    <h2 class="text-lg font-medium text-white">Ordens de Serviço</h2>
+                </div>
+                
+                <!-- Tabela refeita do zero -->
+                <table class="min-w-full divide-y divide-dark-base">
+                    <thead>
+                        <tr class="bg-dark-elevated bg-opacity-50">
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">OS</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Cliente</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Item</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Data de entrada</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Valor</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-dark-base">
+                        <tr class="os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">#1</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">1025</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">João Silva</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">Notebook Dell</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">15/05/2023</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                <span class="px-2 py-1 rounded-full text-xs bg-status-amber bg-opacity-20 text-status-amber">Em andamento</span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">R$ 350,00</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                                <button class="edit-os-btn p-1.5 rounded-full hover:bg-dark-elevated transition-colors duration-200" data-os="1025">
+                                    <svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">#2</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">1026</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">Maria Oliveira</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">Smartphone Samsung</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">16/05/2023</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                <span class="px-2 py-1 rounded-full text-xs bg-status-green bg-opacity-20 text-status-green">Concluído</span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">R$ 200,00</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                                <button class="edit-os-btn p-1.5 rounded-full hover:bg-dark-elevated transition-colors duration-200" data-os="1026">
+                                    <svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Paginação -->
+                <div class="p-4 flex justify-between items-center border-t border-dark-base">
+                    <span class="text-sm text-gray-400">Mostrando 1-2 de 2 resultados</span>
+                    <div class="flex space-x-1">
+                        <button id="prevPage" class="px-3 py-1 rounded bg-dark-elevated text-gray-400 hover:bg-dark-surface transition-colors duration-200 opacity-50" disabled="">Anterior</button>
+                        <button class="page-btn px-3 py-1 rounded bg-accent-blue bg-opacity-20 text-accent-blue" data-page="1">1</button>
+                        <button id="nextPage" class="px-3 py-1 rounded bg-dark-elevated text-gray-400 hover:bg-dark-surface transition-colors duration-200 opacity-50" disabled="">Próximo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão de código fonte -->
+        <div class="fixed bottom-4 right-4">
+            <button id="btnSourceCode" class="source-code-btn p-2 rounded-full bg-dark-elevated hover:bg-dark-surface transition-all duration-200">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Botão flutuante para mobile -->
+        <div class="md:hidden fixed bottom-16 right-4">
+            <button id="btnMobileActions" class="p-3 rounded-full bg-accent-blue text-dark-base shadow-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar OS -->
+    <div id="modalAddOS" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="dark-texture rounded-lg shadow-xl w-full max-w-2xl animate-slideUp">
+                <div class="p-4 border-b border-dark-base flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">Registrar Nova Ordem de Serviço</h3>
+                    <button class="closeModal text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="p-6 modal-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Número da OS (opcional)</label>
+                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
+                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Atendente</label>
+                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Telefone</label>
+                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Item</label>
+                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Data de Entrada</label>
+                            <input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Data Saída</label>
+                            <input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Defeito/Solução</label>
+                            <textarea class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Serviço Prestado</label>
+                            <select id="servicoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                                <option value="">Selecione um serviço</option>
+                                <option value="150.00">Formatação</option>
+                                <option value="250.00">Troca de fonte</option>
+                                <option value="350.00">Troca de tela</option>
+                                <option value="120.00">Limpeza</option>
+                                <option value="200.00">Reparo de placa</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Valor Total</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">R$</span>
+                                <input type="text" id="valorTotal" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly="">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Status</label>
+                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                                <option>Aguardando</option>
+                                <option>Em andamento</option>
+                                <option>Aguardando peça</option>
+                                <option>Concluído</option>
+                                <option>Entregue</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-dark-base flex justify-end space-x-3">
+                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
+                    <button class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar OS -->
+    <div id="modalEditOS" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="dark-texture rounded-lg shadow-xl w-full max-w-2xl animate-slideUp">
+                <div class="p-4 border-b border-dark-base flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">Editar Ordem de Serviço <span id="editOsNumber" class="text-accent-blue">#1025</span></h3>
+                    <button class="closeModal text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="p-6 modal-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Número da OS (opcional)</label>
+                            <input type="text" value="1025" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
+                            <input type="text" id="editClientName" value="João Silva" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Atendente</label>
+                            <input type="text" value="Carlos Técnico" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Telefone</label>
+                            <input type="text" value="(11) 98765-4321" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Item</label>
+                            <input type="text" value="Notebook Dell" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Data de Entrada</label>
+                            <input type="date" value="2023-05-15" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Data Atualização</label>
+                            <div class="w-full rounded-md px-3 py-2 text-sm bg-dark-elevated">15/05/2023</div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Data Saída</label>
+                            <input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Defeito/Solução</label>
+                            <textarea class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20">Notebook não liga. Verificar fonte e bateria.</textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Serviço Prestado</label>
+                            <select id="editServicoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                                <option value="">Selecione um serviço</option>
+                                <option value="150.00">Formatação</option>
+                                <option value="250.00" selected="">Troca de fonte</option>
+                                <option value="350.00">Troca de tela</option>
+                                <option value="120.00">Limpeza</option>
+                                <option value="200.00">Reparo de placa</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Valor Total</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">R$</span>
+                                <input type="text" id="editValorTotal" value="250,00" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly="">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Status</label>
+                            <select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                                <option>Aguardando</option>
+                                <option selected="">Em andamento</option>
+                                <option>Aguardando peça</option>
+                                <option>Concluído</option>
+                                <option>Entregue</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-dark-base flex justify-end space-x-3">
+                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
+                    <button class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Serviço -->
+    <div id="modalAddService" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="dark-texture rounded-lg shadow-xl w-full max-w-md animate-slideUp">
+                <div class="p-4 border-b border-dark-base flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">Adicionar Serviço ao Catálogo</h3>
+                    <button class="closeModal text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Serviço</label>
+                            <input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Preço Total do Serviço</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">R$</span>
+                                <input type="text" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Sua Parte (Comissão)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">R$</span>
+                                <input type="text" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-dark-base flex justify-end space-x-3">
+                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
+                    <button class="px-4 py-2 rounded-md bg-accent-amber text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gráficos de Lucro -->
+    <div id="modalCharts" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="dark-texture rounded-lg shadow-xl w-full max-w-3xl animate-slideUp">
+                <div class="p-4 border-b border-dark-base flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">Relatório de Lucros - Hymdell</h3>
+                    <button class="closeModal text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="mb-6 flex justify-between items-center">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Filtrar por ano</label>
+                            <select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="yearFilter">
+                                <option>2023</option>
+                                <option>2022</option>
+                                <option>2021</option>
+                            </select>
+                        </div>
+                        <div class="flex space-x-4">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-accent-blue rounded-full mr-2"></div>
+                                <span class="text-sm text-gray-400">Lucro</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-accent-amber opacity-50 rounded-full mr-2"></div>
+                                <span class="text-sm text-gray-400">Meta</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="h-64 relative">
+                        <!-- Eixo Y -->
+                        <div class="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400">
+                            <span>R$ 5.000</span>
+                            <span>R$ 4.000</span>
+                            <span>R$ 3.000</span>
+                            <span>R$ 2.000</span>
+                            <span>R$ 1.000</span>
+                            <span>R$ 0</span>
+                        </div>
+                        
+                        <!-- Gráfico -->
+                        <div class="ml-12 h-full flex items-end justify-between relative">
+                            <!-- Linhas horizontais de referência -->
+                            <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                <div class="border-b border-dark-base border-opacity-30 h-0"></div>
+                                <div class="border-b border-dark-base border-opacity-30 h-0"></div>
+                                <div class="border-b border-dark-base border-opacity-30 h-0"></div>
+                                <div class="border-b border-dark-base border-opacity-30 h-0"></div>
+                                <div class="border-b border-dark-base border-opacity-30 h-0"></div>
+                            </div>
+                            
+                            <!-- Linha de meta -->
+                            <div class="absolute top-1/3 left-0 right-0 border-t-2 border-dashed border-accent-amber border-opacity-50"></div>
+                            
+                            <!-- Barras do gráfico -->
+                            <div class="flex-1 flex items-end justify-center">
+                                <div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 30%; height: 0"></div>
+                            </div>
+                            <div class="flex-1 flex items-end justify-center">
+                                <div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 40%; height: 0"></div>
+                            </div>
+                            <div class="flex-1 flex items-end justify-center">
+                                <div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 60%; height: 0"></div>
+                            </div>
+                            <div class="flex-1 flex items-end justify-center">
+                                <div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 50%; height: 0"></div>
+                            </div>
+                            <div class="flex-1 flex items-end justify-center">
+                                <div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 70%; height: 0"></div>
+                            </div>
+                            <div class="flex-1 flex items-end justify-center">
+                                <div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 80%; height: 0"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Eixo X -->
+                    <div class="ml-12 mt-2 flex justify-between text-xs text-gray-400">
+                        <span>Jan</span>
+                        <span>Fev</span>
+                        <span>Mar</span>
+                        <span>Abr</span>
+                        <span>Mai</span>
+                        <span>Jun</span>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-dark-base flex justify-between items-center">
+                    <div>
+                        <span class="text-sm text-gray-400">Total do período: <span class="text-white font-medium">R$ 16.500,00</span></span>
+                    </div>
+                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Código Fonte -->
+    <div id="modalSourceCode" class="fixed inset-0 z-50">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="dark-texture rounded-lg shadow-xl w-full max-w-4xl animate-slideUp">
+                <div class="p-4 border-b border-dark-base flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">Código Fonte</h3>
+                    <button class="closeModal text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="p-4 modal-content">
+                    <div class="bg-dark-base p-4 rounded-md text-xs text-gray-300 overflow-auto max-h-96 source-code" id="sourceCodeContent">&lt;html lang="pt-BR"&gt;&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Hymdell Manutenções&lt;/title&gt;
+    &lt;link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;amp;display=swap" rel="stylesheet"&gt;
+    &lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;
+    &lt;script&gt;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-base': '#1A1A1D',
+                        'dark-surface': '#2C2C30',
+                        'dark-elevated': '#3A3A3F',
+                        'accent-blue': '#A3D5FF',
+                        'accent-amber': '#FFB84C',
+                        'status-green': '#4CAF50',
+                        'status-amber': '#FFB84C',
+                        'status-red': '#F44336',
+                    },
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    &lt;/script&gt;
+    &lt;style&gt;
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1A1A1D;
+            background-image: 
+                linear-gradient(to right, rgba(60, 60, 65, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(60, 60, 65, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .dark-texture {
+            background-color: #2C2C30;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%233A3A3F' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+        }
+
+        .os-row:hover {
+            box-shadow: 0 0 0 1px #A3D5FF;
+            background-color: rgba(163, 213, 255, 0.05);
+        }
+
+        .chart-bar {
+            transition: height 1s ease-in-out;
+        }
+
+        .logo-icon {
+            filter: drop-shadow(0 0 3px rgba(163, 213, 255, 0.3));
+        }
+
+        .source-code-btn {
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .source-code-btn:hover {
+            opacity: 1;
+        }
+
+        /* Estilização para inputs */
+        input, select, textarea {
+            background-color: rgba(42, 42, 46, 0.8);
+            border: 1px solid #3A3A3F;
+            color: #e2e2e2;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #A3D5FF;
+            box-shadow: 0 0 0 2px rgba(163, 213, 255, 0.2);
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-slideUp {
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        /* Animação para as barras do gráfico */
+        @keyframes barGrow {
+            from { height: 0; }
+            to { height: var(--target-height); }
+        }
+        
+        .bar-animate {
+            animation: barGrow 1s ease-out forwards;
+        }
+
+        /* Ajuste para modais */
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1A1A1D;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3A3A3F;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A3D5FF;
+        }
+        
+        /* Código fonte */
+        .source-code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+    &lt;/style&gt;
+&lt;style&gt;*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-16{bottom:4rem}.bottom-28{bottom:7rem}.bottom-4{bottom:1rem}.left-0{left:0px}.left-3{left:0.75rem}.right-0{right:0px}.right-4{right:1rem}.top-0{top:0px}.top-1\/3{top:33.333333%}.top-2{top:0.5rem}.top-2\.5{top:0.625rem}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-12{margin-left:3rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-2{margin-top:0.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-0{height:0px}.h-10{height:2.5rem}.h-20{height:5rem}.h-3{height:0.75rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-64{height:16rem}.h-full{height:100%}.max-h-96{max-height:24rem}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-3{width:0.75rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-full{width:100%}.min-w-full{min-width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-6xl{max-width:72rem}.max-w-md{max-width:28rem}.flex-1{flex:1 1 0%}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.space-x-1 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.25rem * var(--tw-space-x-reverse));margin-left:calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-2 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.divide-y &gt; :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-dark-base &gt; :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(26 26 29 / var(--tw-divide-opacity, 1))}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-t-sm{border-top-left-radius:0.125rem;border-top-right-radius:0.125rem}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-t-2{border-top-width:2px}.border-dashed{border-style:dashed}.border-accent-amber{--tw-border-opacity:1;border-color:rgb(255 184 76 / var(--tw-border-opacity, 1))}.border-dark-base{--tw-border-opacity:1;border-color:rgb(26 26 29 / var(--tw-border-opacity, 1))}.border-opacity-30{--tw-border-opacity:0.3}.border-opacity-50{--tw-border-opacity:0.5}.bg-accent-amber{--tw-bg-opacity:1;background-color:rgb(255 184 76 / var(--tw-bg-opacity, 1))}.bg-accent-blue{--tw-bg-opacity:1;background-color:rgb(163 213 255 / var(--tw-bg-opacity, 1))}.bg-dark-base{--tw-bg-opacity:1;background-color:rgb(26 26 29 / var(--tw-bg-opacity, 1))}.bg-dark-elevated{--tw-bg-opacity:1;background-color:rgb(58 58 63 / var(--tw-bg-opacity, 1))}.bg-status-amber{--tw-bg-opacity:1;background-color:rgb(255 184 76 / var(--tw-bg-opacity, 1))}.bg-status-green{--tw-bg-opacity:1;background-color:rgb(76 175 80 / var(--tw-bg-opacity, 1))}.bg-opacity-20{--tw-bg-opacity:0.2}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-opacity-80{--tw-bg-opacity:0.8}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pl-10{padding-left:2.5rem}.pl-8{padding-left:2rem}.pr-3{padding-right:0.75rem}.pr-4{padding-right:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tracking-wider{letter-spacing:0.05em}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-accent-amber{--tw-text-opacity:1;color:rgb(255 184 76 / var(--tw-text-opacity, 1))}.text-accent-blue{--tw-text-opacity:1;color:rgb(163 213 255 / var(--tw-text-opacity, 1))}.text-dark-base{--tw-text-opacity:1;color:rgb(26 26 29 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-status-amber{--tw-text-opacity:1;color:rgb(255 184 76 / var(--tw-text-opacity, 1))}.text-status-green{--tw-text-opacity:1;color:rgb(76 175 80 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-50{opacity:0.5}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:bg-dark-elevated:hover{--tw-bg-opacity:1;background-color:rgb(58 58 63 / var(--tw-bg-opacity, 1))}.hover\:bg-dark-surface:hover{--tw-bg-opacity:1;background-color:rgb(44 44 48 / var(--tw-bg-opacity, 1))}.hover\:bg-opacity-30:hover{--tw-bg-opacity:0.3}.hover\:bg-opacity-90:hover{--tw-bg-opacity:0.9}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 768px){.md\:col-span-2{grid-column:span 2 / span 2}.md\:mb-0{margin-bottom:0px}.md\:inline{display:inline}.md\:hidden{display:none}.md\:w-1\/3{width:33.333333%}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:justify-between{justify-content:space-between}.md\:space-x-4 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.md\:space-y-0 &gt; :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0px * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0px * var(--tw-space-y-reverse))}.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}}&lt;/style&gt;&lt;/head&gt;
+&lt;body class="text-gray-200 min-h-screen" style="overflow: hidden;"&gt;
+    &lt;div class="container mx-auto px-4 py-6 max-w-6xl"&gt;
+        &lt;!-- Cabeçalho --&gt;
+        &lt;header class="flex flex-col md:flex-row justify-center md:justify-between items-center mb-8 animate-fadeIn"&gt;
+            &lt;div class="flex items-center mb-4 md:mb-0"&gt;
+                &lt;div class="mr-3"&gt;
+                    &lt;svg class="w-10 h-10 logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"&gt;
+                        &lt;path d="M20 5L5 12.5V27.5L20 35L35 27.5V12.5L20 5Z" stroke="#A3D5FF" stroke-width="2"&gt;&lt;/path&gt;
+                        &lt;path d="M12 15H28M12 25H28M10 20H30M20 10V30" stroke="#A3D5FF" stroke-width="2" stroke-linecap="round"&gt;&lt;/path&gt;
+                        &lt;path d="M20 5L5 12.5V27.5L20 35L35 27.5V12.5L20 5Z" stroke="#FFB84C" stroke-width="1" stroke-opacity="0.5"&gt;&lt;/path&gt;
+                    &lt;/svg&gt;
+                &lt;/div&gt;
+                &lt;h1 class="text-2xl md:text-3xl font-semibold tracking-wider text-white"&gt;Hymdell Manutenções&lt;/h1&gt;
+            &lt;/div&gt;
+        &lt;/header&gt;
+
+        &lt;!-- Painel de Controle --&gt;
+        &lt;div class="dark-texture rounded-lg p-4 mb-6 shadow-lg animate-slideUp"&gt;
+            &lt;div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"&gt;
+                &lt;div class="w-full md:w-1/3 relative"&gt;
+                    &lt;input type="text" placeholder="Buscar por OS, cliente, serviço..." class="w-full pl-10 pr-4 py-2 rounded-md text-sm focus:outline-none"&gt;
+                    &lt;svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                        &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"&gt;&lt;/path&gt;
+                    &lt;/svg&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="flex items-center space-x-2 md:space-x-4"&gt;
+                    &lt;button id="btnAddOS" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200"&gt;
+                        &lt;svg class="w-4 h-4 mr-1 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                        &lt;span class="hidden md:inline"&gt;Adicionar OS&lt;/span&gt;
+                    &lt;/button&gt;
+                    
+                    &lt;button id="btnAddService" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200"&gt;
+                        &lt;svg class="w-4 h-4 mr-1 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                        &lt;span class="hidden md:inline"&gt;Adicionar Serviço&lt;/span&gt;
+                    &lt;/button&gt;
+                    
+                    &lt;button id="btnViewCharts" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200"&gt;
+                        &lt;svg class="w-4 h-4 mr-1 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                        &lt;span class="hidden md:inline"&gt;Ver Gráficos&lt;/span&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Área de Conteúdo (Tabela de OS) --&gt;
+        &lt;div class="dark-texture rounded-lg shadow-lg overflow-hidden animate-slideUp"&gt;
+            &lt;div class="overflow-x-auto"&gt;
+                &lt;div class="p-4 bg-dark-elevated border-b border-dark-base"&gt;
+                    &lt;h2 class="text-lg font-medium text-white"&gt;Ordens de Serviço&lt;/h2&gt;
+                &lt;/div&gt;
+                
+                &lt;!-- Tabela refeita do zero --&gt;
+                &lt;table class="min-w-full divide-y divide-dark-base"&gt;
+                    &lt;thead&gt;
+                        &lt;tr class="bg-dark-elevated bg-opacity-50"&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;ID&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;OS&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;Cliente&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;Item&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;Data de entrada&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;Status&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;Valor&lt;/th&gt;
+                            &lt;th class="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"&gt;Ações&lt;/th&gt;
+                        &lt;/tr&gt;
+                    &lt;/thead&gt;
+                    &lt;tbody class="divide-y divide-dark-base"&gt;
+                        &lt;tr class="os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30"&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;#1&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;1025&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;João Silva&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;Notebook Dell&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;15/05/2023&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;
+                                &lt;span class="px-2 py-1 rounded-full text-xs bg-status-amber bg-opacity-20 text-status-amber"&gt;Em andamento&lt;/span&gt;
+                            &lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;R$ 350,00&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm text-center"&gt;
+                                &lt;button class="edit-os-btn p-1.5 rounded-full hover:bg-dark-elevated transition-colors duration-200" data-os="1025"&gt;
+                                    &lt;svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                                        &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"&gt;&lt;/path&gt;
+                                    &lt;/svg&gt;
+                                &lt;/button&gt;
+                            &lt;/td&gt;
+                        &lt;/tr&gt;
+                        &lt;tr class="os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30"&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;#2&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;1026&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;Maria Oliveira&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;Smartphone Samsung&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;16/05/2023&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;
+                                &lt;span class="px-2 py-1 rounded-full text-xs bg-status-green bg-opacity-20 text-status-green"&gt;Concluído&lt;/span&gt;
+                            &lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm"&gt;R$ 200,00&lt;/td&gt;
+                            &lt;td class="px-4 py-3 whitespace-nowrap text-sm text-center"&gt;
+                                &lt;button class="edit-os-btn p-1.5 rounded-full hover:bg-dark-elevated transition-colors duration-200" data-os="1026"&gt;
+                                    &lt;svg class="w-4 h-4 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                                        &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"&gt;&lt;/path&gt;
+                                    &lt;/svg&gt;
+                                &lt;/button&gt;
+                            &lt;/td&gt;
+                        &lt;/tr&gt;
+                    &lt;/tbody&gt;
+                &lt;/table&gt;
+                
+                &lt;!-- Paginação --&gt;
+                &lt;div class="p-4 flex justify-between items-center border-t border-dark-base"&gt;
+                    &lt;span class="text-sm text-gray-400"&gt;Mostrando 1-2 de 2 resultados&lt;/span&gt;
+                    &lt;div class="flex space-x-1"&gt;
+                        &lt;button id="prevPage" class="px-3 py-1 rounded bg-dark-elevated text-gray-400 hover:bg-dark-surface transition-colors duration-200 opacity-50" disabled=""&gt;Anterior&lt;/button&gt;
+                        &lt;button class="page-btn px-3 py-1 rounded bg-accent-blue bg-opacity-20 text-accent-blue" data-page="1"&gt;1&lt;/button&gt;
+                        &lt;button id="nextPage" class="px-3 py-1 rounded bg-dark-elevated text-gray-400 hover:bg-dark-surface transition-colors duration-200 opacity-50" disabled=""&gt;Próximo&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Botão de código fonte --&gt;
+        &lt;div class="fixed bottom-4 right-4"&gt;
+            &lt;button id="btnSourceCode" class="source-code-btn p-2 rounded-full bg-dark-elevated hover:bg-dark-surface transition-all duration-200"&gt;
+                &lt;svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                    &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"&gt;&lt;/path&gt;
+                &lt;/svg&gt;
+            &lt;/button&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Botão flutuante para mobile --&gt;
+        &lt;div class="md:hidden fixed bottom-16 right-4"&gt;
+            &lt;button id="btnMobileActions" class="p-3 rounded-full bg-accent-blue text-dark-base shadow-lg"&gt;
+                &lt;svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                    &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"&gt;&lt;/path&gt;
+                &lt;/svg&gt;
+            &lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Modal Adicionar OS --&gt;
+    &lt;div id="modalAddOS" class="fixed inset-0 z-50 hidden"&gt;
+        &lt;div class="modal-backdrop fixed inset-0"&gt;&lt;/div&gt;
+        &lt;div class="fixed inset-0 flex items-center justify-center p-4"&gt;
+            &lt;div class="dark-texture rounded-lg shadow-xl w-full max-w-2xl animate-slideUp"&gt;
+                &lt;div class="p-4 border-b border-dark-base flex justify-between items-center"&gt;
+                    &lt;h3 class="text-lg font-medium text-white"&gt;Registrar Nova Ordem de Serviço&lt;/h3&gt;
+                    &lt;button class="closeModal text-gray-400 hover:text-white"&gt;
+                        &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-6 modal-content"&gt;
+                    &lt;div class="grid grid-cols-1 md:grid-cols-2 gap-4"&gt;
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Número da OS (opcional)&lt;/label&gt;
+                            &lt;input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Nome do Cliente&lt;/label&gt;
+                            &lt;input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Atendente&lt;/label&gt;
+                            &lt;input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Telefone&lt;/label&gt;
+                            &lt;input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Item&lt;/label&gt;
+                            &lt;input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Data de Entrada&lt;/label&gt;
+                            &lt;input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Data Saída&lt;/label&gt;
+                            &lt;input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div class="md:col-span-2"&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Defeito/Solução&lt;/label&gt;
+                            &lt;textarea class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20"&gt;&lt;/textarea&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Serviço Prestado&lt;/label&gt;
+                            &lt;select id="servicoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                                &lt;option value=""&gt;Selecione um serviço&lt;/option&gt;
+                                &lt;option value="150.00"&gt;Formatação&lt;/option&gt;
+                                &lt;option value="250.00"&gt;Troca de fonte&lt;/option&gt;
+                                &lt;option value="350.00"&gt;Troca de tela&lt;/option&gt;
+                                &lt;option value="120.00"&gt;Limpeza&lt;/option&gt;
+                                &lt;option value="200.00"&gt;Reparo de placa&lt;/option&gt;
+                            &lt;/select&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Valor Total&lt;/label&gt;
+                            &lt;div class="relative"&gt;
+                                &lt;span class="absolute left-3 top-2 text-gray-500"&gt;R$&lt;/span&gt;
+                                &lt;input type="text" id="valorTotal" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly=""&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Status&lt;/label&gt;
+                            &lt;select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                                &lt;option&gt;Aguardando&lt;/option&gt;
+                                &lt;option&gt;Em andamento&lt;/option&gt;
+                                &lt;option&gt;Aguardando peça&lt;/option&gt;
+                                &lt;option&gt;Concluído&lt;/option&gt;
+                                &lt;option&gt;Entregue&lt;/option&gt;
+                            &lt;/select&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-4 border-t border-dark-base flex justify-end space-x-3"&gt;
+                    &lt;button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200"&gt;Cancelar&lt;/button&gt;
+                    &lt;button class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200"&gt;Salvar&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Modal Editar OS --&gt;
+    &lt;div id="modalEditOS" class="fixed inset-0 z-50 hidden"&gt;
+        &lt;div class="modal-backdrop fixed inset-0"&gt;&lt;/div&gt;
+        &lt;div class="fixed inset-0 flex items-center justify-center p-4"&gt;
+            &lt;div class="dark-texture rounded-lg shadow-xl w-full max-w-2xl animate-slideUp"&gt;
+                &lt;div class="p-4 border-b border-dark-base flex justify-between items-center"&gt;
+                    &lt;h3 class="text-lg font-medium text-white"&gt;Editar Ordem de Serviço &lt;span id="editOsNumber" class="text-accent-blue"&gt;#1025&lt;/span&gt;&lt;/h3&gt;
+                    &lt;button class="closeModal text-gray-400 hover:text-white"&gt;
+                        &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-6 modal-content"&gt;
+                    &lt;div class="grid grid-cols-1 md:grid-cols-2 gap-4"&gt;
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Número da OS (opcional)&lt;/label&gt;
+                            &lt;input type="text" value="1025" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Nome do Cliente&lt;/label&gt;
+                            &lt;input type="text" id="editClientName" value="João Silva" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Atendente&lt;/label&gt;
+                            &lt;input type="text" value="Carlos Técnico" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Telefone&lt;/label&gt;
+                            &lt;input type="text" value="(11) 98765-4321" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Item&lt;/label&gt;
+                            &lt;input type="text" value="Notebook Dell" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Data de Entrada&lt;/label&gt;
+                            &lt;input type="date" value="2023-05-15" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Data Atualização&lt;/label&gt;
+                            &lt;div class="w-full rounded-md px-3 py-2 text-sm bg-dark-elevated"&gt;15/05/2023&lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Data Saída&lt;/label&gt;
+                            &lt;input type="date" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div class="md:col-span-2"&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Defeito/Solução&lt;/label&gt;
+                            &lt;textarea class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20"&gt;Notebook não liga. Verificar fonte e bateria.&lt;/textarea&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Serviço Prestado&lt;/label&gt;
+                            &lt;select id="editServicoSelect" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                                &lt;option value=""&gt;Selecione um serviço&lt;/option&gt;
+                                &lt;option value="150.00"&gt;Formatação&lt;/option&gt;
+                                &lt;option value="250.00" selected=""&gt;Troca de fonte&lt;/option&gt;
+                                &lt;option value="350.00"&gt;Troca de tela&lt;/option&gt;
+                                &lt;option value="120.00"&gt;Limpeza&lt;/option&gt;
+                                &lt;option value="200.00"&gt;Reparo de placa&lt;/option&gt;
+                            &lt;/select&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Valor Total&lt;/label&gt;
+                            &lt;div class="relative"&gt;
+                                &lt;span class="absolute left-3 top-2 text-gray-500"&gt;R$&lt;/span&gt;
+                                &lt;input type="text" id="editValorTotal" value="250,00" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly=""&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Status&lt;/label&gt;
+                            &lt;select class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                                &lt;option&gt;Aguardando&lt;/option&gt;
+                                &lt;option selected=""&gt;Em andamento&lt;/option&gt;
+                                &lt;option&gt;Aguardando peça&lt;/option&gt;
+                                &lt;option&gt;Concluído&lt;/option&gt;
+                                &lt;option&gt;Entregue&lt;/option&gt;
+                            &lt;/select&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-4 border-t border-dark-base flex justify-end space-x-3"&gt;
+                    &lt;button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200"&gt;Cancelar&lt;/button&gt;
+                    &lt;button class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200"&gt;Salvar Alterações&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Modal Adicionar Serviço --&gt;
+    &lt;div id="modalAddService" class="fixed inset-0 z-50 hidden"&gt;
+        &lt;div class="modal-backdrop fixed inset-0"&gt;&lt;/div&gt;
+        &lt;div class="fixed inset-0 flex items-center justify-center p-4"&gt;
+            &lt;div class="dark-texture rounded-lg shadow-xl w-full max-w-md animate-slideUp"&gt;
+                &lt;div class="p-4 border-b border-dark-base flex justify-between items-center"&gt;
+                    &lt;h3 class="text-lg font-medium text-white"&gt;Adicionar Serviço ao Catálogo&lt;/h3&gt;
+                    &lt;button class="closeModal text-gray-400 hover:text-white"&gt;
+                        &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-6"&gt;
+                    &lt;div class="space-y-4"&gt;
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Nome do Serviço&lt;/label&gt;
+                            &lt;input type="text" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none"&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Preço Total do Serviço&lt;/label&gt;
+                            &lt;div class="relative"&gt;
+                                &lt;span class="absolute left-3 top-2 text-gray-500"&gt;R$&lt;/span&gt;
+                                &lt;input type="text" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none"&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Sua Parte (Comissão)&lt;/label&gt;
+                            &lt;div class="relative"&gt;
+                                &lt;span class="absolute left-3 top-2 text-gray-500"&gt;R$&lt;/span&gt;
+                                &lt;input type="text" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none"&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-4 border-t border-dark-base flex justify-end space-x-3"&gt;
+                    &lt;button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200"&gt;Cancelar&lt;/button&gt;
+                    &lt;button class="px-4 py-2 rounded-md bg-accent-amber text-dark-base hover:bg-opacity-90 transition-colors duration-200"&gt;Salvar&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Modal Gráficos de Lucro --&gt;
+    &lt;div id="modalCharts" class="fixed inset-0 z-50 hidden"&gt;
+        &lt;div class="modal-backdrop fixed inset-0"&gt;&lt;/div&gt;
+        &lt;div class="fixed inset-0 flex items-center justify-center p-4"&gt;
+            &lt;div class="dark-texture rounded-lg shadow-xl w-full max-w-3xl animate-slideUp"&gt;
+                &lt;div class="p-4 border-b border-dark-base flex justify-between items-center"&gt;
+                    &lt;h3 class="text-lg font-medium text-white"&gt;Relatório de Lucros - Hymdell&lt;/h3&gt;
+                    &lt;button class="closeModal text-gray-400 hover:text-white"&gt;
+                        &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-6"&gt;
+                    &lt;div class="mb-6 flex justify-between items-center"&gt;
+                        &lt;div&gt;
+                            &lt;label class="block text-sm font-medium text-gray-400 mb-1"&gt;Filtrar por ano&lt;/label&gt;
+                            &lt;select class="rounded-md px-3 py-2 text-sm focus:outline-none" id="yearFilter"&gt;
+                                &lt;option&gt;2023&lt;/option&gt;
+                                &lt;option&gt;2022&lt;/option&gt;
+                                &lt;option&gt;2021&lt;/option&gt;
+                            &lt;/select&gt;
+                        &lt;/div&gt;
+                        &lt;div class="flex space-x-4"&gt;
+                            &lt;div class="flex items-center"&gt;
+                                &lt;div class="w-3 h-3 bg-accent-blue rounded-full mr-2"&gt;&lt;/div&gt;
+                                &lt;span class="text-sm text-gray-400"&gt;Lucro&lt;/span&gt;
+                            &lt;/div&gt;
+                            &lt;div class="flex items-center"&gt;
+                                &lt;div class="w-3 h-3 bg-accent-amber opacity-50 rounded-full mr-2"&gt;&lt;/div&gt;
+                                &lt;span class="text-sm text-gray-400"&gt;Meta&lt;/span&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class="h-64 relative"&gt;
+                        &lt;!-- Eixo Y --&gt;
+                        &lt;div class="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-400"&gt;
+                            &lt;span&gt;R$ 5.000&lt;/span&gt;
+                            &lt;span&gt;R$ 4.000&lt;/span&gt;
+                            &lt;span&gt;R$ 3.000&lt;/span&gt;
+                            &lt;span&gt;R$ 2.000&lt;/span&gt;
+                            &lt;span&gt;R$ 1.000&lt;/span&gt;
+                            &lt;span&gt;R$ 0&lt;/span&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;!-- Gráfico --&gt;
+                        &lt;div class="ml-12 h-full flex items-end justify-between relative"&gt;
+                            &lt;!-- Linhas horizontais de referência --&gt;
+                            &lt;div class="absolute inset-0 flex flex-col justify-between pointer-events-none"&gt;
+                                &lt;div class="border-b border-dark-base border-opacity-30 h-0"&gt;&lt;/div&gt;
+                                &lt;div class="border-b border-dark-base border-opacity-30 h-0"&gt;&lt;/div&gt;
+                                &lt;div class="border-b border-dark-base border-opacity-30 h-0"&gt;&lt;/div&gt;
+                                &lt;div class="border-b border-dark-base border-opacity-30 h-0"&gt;&lt;/div&gt;
+                                &lt;div class="border-b border-dark-base border-opacity-30 h-0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                            
+                            &lt;!-- Linha de meta --&gt;
+                            &lt;div class="absolute top-1/3 left-0 right-0 border-t-2 border-dashed border-accent-amber border-opacity-50"&gt;&lt;/div&gt;
+                            
+                            &lt;!-- Barras do gráfico --&gt;
+                            &lt;div class="flex-1 flex items-end justify-center"&gt;
+                                &lt;div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 30%; height: 0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class="flex-1 flex items-end justify-center"&gt;
+                                &lt;div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 40%; height: 0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class="flex-1 flex items-end justify-center"&gt;
+                                &lt;div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 60%; height: 0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class="flex-1 flex items-end justify-center"&gt;
+                                &lt;div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 50%; height: 0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class="flex-1 flex items-end justify-center"&gt;
+                                &lt;div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 70%; height: 0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class="flex-1 flex items-end justify-center"&gt;
+                                &lt;div class="w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar" style="--target-height: 80%; height: 0"&gt;&lt;/div&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;!-- Eixo X --&gt;
+                    &lt;div class="ml-12 mt-2 flex justify-between text-xs text-gray-400"&gt;
+                        &lt;span&gt;Jan&lt;/span&gt;
+                        &lt;span&gt;Fev&lt;/span&gt;
+                        &lt;span&gt;Mar&lt;/span&gt;
+                        &lt;span&gt;Abr&lt;/span&gt;
+                        &lt;span&gt;Mai&lt;/span&gt;
+                        &lt;span&gt;Jun&lt;/span&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-4 border-t border-dark-base flex justify-between items-center"&gt;
+                    &lt;div&gt;
+                        &lt;span class="text-sm text-gray-400"&gt;Total do período: &lt;span class="text-white font-medium"&gt;R$ 16.500,00&lt;/span&gt;&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200"&gt;Fechar&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Modal Código Fonte --&gt;
+    &lt;div id="modalSourceCode" class="fixed inset-0 z-50"&gt;
+        &lt;div class="modal-backdrop fixed inset-0"&gt;&lt;/div&gt;
+        &lt;div class="fixed inset-0 flex items-center justify-center p-4"&gt;
+            &lt;div class="dark-texture rounded-lg shadow-xl w-full max-w-4xl animate-slideUp"&gt;
+                &lt;div class="p-4 border-b border-dark-base flex justify-between items-center"&gt;
+                    &lt;h3 class="text-lg font-medium text-white"&gt;Código Fonte&lt;/h3&gt;
+                    &lt;button class="closeModal text-gray-400 hover:text-white"&gt;
+                        &lt;svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                            &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"&gt;&lt;/path&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-4 modal-content"&gt;
+                    &lt;div class="bg-dark-base p-4 rounded-md text-xs text-gray-300 overflow-auto max-h-96 source-code" id="sourceCodeContent"&gt;
+                        Carregando código fonte...
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="p-4 border-t border-dark-base flex justify-end"&gt;
+                    &lt;button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200"&gt;Fechar&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Menu de ações mobile --&gt;
+    &lt;div id="mobileActionsMenu" class="fixed bottom-28 right-4 bg-dark-elevated rounded-lg shadow-lg p-2 hidden animate-fadeIn"&gt;
+        &lt;div class="flex flex-col space-y-2"&gt;
+            &lt;button id="btnMobileAddOS" class="flex items-center space-x-2 p-2 rounded hover:bg-dark-surface"&gt;
+                &lt;svg class="w-5 h-5 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                    &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"&gt;&lt;/path&gt;
+                &lt;/svg&gt;
+                &lt;span&gt;Adicionar OS&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;button id="btnMobileAddService" class="flex items-center space-x-2 p-2 rounded hover:bg-dark-surface"&gt;
+                &lt;svg class="w-5 h-5 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                    &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"&gt;&lt;/path&gt;
+                &lt;/svg&gt;
+                &lt;span&gt;Adicionar Serviço&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;button id="btnMobileViewCharts" class="flex items-center space-x-2 p-2 rounded hover:bg-dark-surface"&gt;
+                &lt;svg class="w-5 h-5 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                    &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"&gt;&lt;/path&gt;
+                &lt;/svg&gt;
+                &lt;span&gt;Ver Gráficos&lt;/span&gt;
+            &lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        // Manipulação das modais
+        const modals = {
+            'modalAddOS': document.getElementById('modalAddOS'),
+            'modalEditOS': document.getElementById('modalEditOS'),
+            'modalAddService': document.getElementById('modalAddService'),
+            'modalCharts': document.getElementById('modalCharts'),
+            'modalSourceCode': document.getElementById('modalSourceCode')
+        };
+
+        // Botões para abrir modais
+        document.getElementById('btnAddOS').addEventListener('click', () =&gt; openModal('modalAddOS'));
+        document.getElementById('btnAddService').addEventListener('click', () =&gt; openModal('modalAddService'));
+        document.getElementById('btnViewCharts').addEventListener('click', () =&gt; openModal('modalCharts'));
+        document.getElementById('btnSourceCode').addEventListener('click', () =&gt; {
+            openModal('modalSourceCode');
+            loadSourceCode();
+        });
+
+        // Botões de edição de OS
+        document.querySelectorAll('.edit-os-btn').forEach(button =&gt; {
+            button.addEventListener('click', function() {
+                const osNumber = this.getAttribute('data-os');
+                document.getElementById('editOsNumber').textContent = `#${osNumber}`;
+                openModal('modalEditOS');
+            });
+        });
+
+        // Botões mobile
+        document.getElementById('btnMobileActions').addEventListener('click', toggleMobileMenu);
+        document.getElementById('btnMobileAddOS').addEventListener('click', () =&gt; { openModal('modalAddOS'); closeMobileMenu(); });
+        document.getElementById('btnMobileAddService').addEventListener('click', () =&gt; { openModal('modalAddService'); closeMobileMenu(); });
+        document.getElementById('btnMobileViewCharts').addEventListener('click', () =&gt; { openModal('modalCharts'); closeMobileMenu(); });
+
+        // Botões para fechar modais
+        document.querySelectorAll('.closeModal').forEach(button =&gt; {
+            button.addEventListener('click', closeAllModals);
+        });
+
+        // Fechar modais ao clicar fora
+        Object.values(modals).forEach(modal =&gt; {
+            modal.addEventListener('click', (e) =&gt; {
+                if (e.target === modal) closeAllModals();
+            });
+        });
+
+        // Funções de manipulação de modais
+        function openModal(modalId) {
+            closeAllModals();
+            modals[modalId].classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            if (modalId === 'modalCharts') {
+                animateChartBars();
+            }
+        }
+
+        function closeAllModals() {
+            Object.values(modals).forEach(modal =&gt; {
+                modal.classList.add('hidden');
+            });
+            document.body.style.overflow = '';
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileActionsMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('mobileActionsMenu').classList.add('hidden');
+        }
+
+        // Animação das barras do gráfico quando o modal é aberto
+        function animateChartBars() {
+            setTimeout(() =&gt; {
+                const bars = document.querySelectorAll('.chart-bar');
+                bars.forEach(bar =&gt; {
+                    const targetHeight = bar.style.getPropertyValue('--target-height');
+                    bar.style.height = '0%';
+                    bar.classList.add('bar-animate');
+                    setTimeout(() =&gt; {
+                        bar.style.height = targetHeight;
+                    }, 100);
+                });
+            }, 300);
+        }
+
+        // Alternar ano do gráfico
+        document.getElementById('yearFilter').addEventListener('change', function() {
+            const bars = document.querySelectorAll('.chart-bar');
+            const randomHeights = [
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%'
+            ];
+            
+            bars.forEach((bar, index) =&gt; {
+                bar.style.setProperty('--target-height', randomHeights[index]);
+                bar.style.height = '0%';
+            });
+            
+            setTimeout(() =&gt; {
+                bars.forEach((bar, index) =&gt; {
+                    bar.style.height = randomHeights[index];
+                });
+            }, 100);
+        });
+
+        // Carregar código fonte
+        function loadSourceCode() {
+            const sourceCodeElement = document.getElementById('sourceCodeContent');
+            
+            // Obter o código fonte da página atual
+            const htmlContent = document.documentElement.outerHTML;
+            
+            // Escapar caracteres especiais para exibição segura
+            const escapedHtml = htmlContent
+                .replace(/&amp;/g, "&amp;amp;")
+                .replace(/&lt;/g, "&amp;lt;")
+                .replace(/&gt;/g, "&amp;gt;")
+                .replace(/"/g, "&amp;quot;")
+                .replace(/'/g, "&amp;#039;");
+            
+            // Exibir o código fonte
+            sourceCodeElement.textContent = htmlContent;
+        }
+
+        // Atualizar valor com base no serviço selecionado
+        document.getElementById('servicoSelect').addEventListener('change', function() {
+            const valorInput = document.getElementById('valorTotal');
+            const valorSelecionado = this.value;
+            
+            if (valorSelecionado) {
+                // Formatar o valor para o formato brasileiro (R$ 000,00)
+                const valorFormatado = parseFloat(valorSelecionado).toFixed(2).replace('.', ',');
+                valorInput.value = valorFormatado;
+            } else {
+                valorInput.value = '';
+            }
+        });
+
+        // Atualizar valor com base no serviço selecionado (modal de edição)
+        document.getElementById('editServicoSelect').addEventListener('change', function() {
+            const valorInput = document.getElementById('editValorTotal');
+            const valorSelecionado = this.value;
+            
+            if (valorSelecionado) {
+                // Formatar o valor para o formato brasileiro (R$ 000,00)
+                const valorFormatado = parseFloat(valorSelecionado).toFixed(2).replace('.', ',');
+                valorInput.value = valorFormatado;
+            } else {
+                valorInput.value = '';
+            }
+        });
+    &lt;/script&gt;
+&lt;script&gt;(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9555041910e1e017',t:'MTc1MDg2MDI4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&amp;&amp;(document.onreadystatechange=e,c())}}}})();&lt;/script&gt;&lt;iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"&gt;&lt;/iframe&gt;
+
+&lt;/body&gt;&lt;/html&gt;</div>
+                </div>
+                
+                <div class="p-4 border-t border-dark-base flex justify-end">
+                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu de ações mobile -->
+    <div id="mobileActionsMenu" class="fixed bottom-28 right-4 bg-dark-elevated rounded-lg shadow-lg p-2 hidden animate-fadeIn">
+        <div class="flex flex-col space-y-2">
+            <button id="btnMobileAddOS" class="flex items-center space-x-2 p-2 rounded hover:bg-dark-surface">
+                <svg class="w-5 h-5 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Adicionar OS</span>
+            </button>
+            <button id="btnMobileAddService" class="flex items-center space-x-2 p-2 rounded hover:bg-dark-surface">
+                <svg class="w-5 h-5 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span>Adicionar Serviço</span>
+            </button>
+            <button id="btnMobileViewCharts" class="flex items-center space-x-2 p-2 rounded hover:bg-dark-surface">
+                <svg class="w-5 h-5 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span>Ver Gráficos</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Manipulação das modais
+        const modals = {
+            'modalAddOS': document.getElementById('modalAddOS'),
+            'modalEditOS': document.getElementById('modalEditOS'),
+            'modalAddService': document.getElementById('modalAddService'),
+            'modalCharts': document.getElementById('modalCharts'),
+            'modalSourceCode': document.getElementById('modalSourceCode')
+        };
+
+        // Botões para abrir modais
+        document.getElementById('btnAddOS').addEventListener('click', () => openModal('modalAddOS'));
+        document.getElementById('btnAddService').addEventListener('click', () => openModal('modalAddService'));
+        document.getElementById('btnViewCharts').addEventListener('click', () => openModal('modalCharts'));
+        document.getElementById('btnSourceCode').addEventListener('click', () => {
+            openModal('modalSourceCode');
+            loadSourceCode();
+        });
+
+        // Botões de edição de OS
+        document.querySelectorAll('.edit-os-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const osNumber = this.getAttribute('data-os');
+                document.getElementById('editOsNumber').textContent = `#${osNumber}`;
+                openModal('modalEditOS');
+            });
+        });
+
+        // Botões mobile
+        document.getElementById('btnMobileActions').addEventListener('click', toggleMobileMenu);
+        document.getElementById('btnMobileAddOS').addEventListener('click', () => { openModal('modalAddOS'); closeMobileMenu(); });
+        document.getElementById('btnMobileAddService').addEventListener('click', () => { openModal('modalAddService'); closeMobileMenu(); });
+        document.getElementById('btnMobileViewCharts').addEventListener('click', () => { openModal('modalCharts'); closeMobileMenu(); });
+
+        // Botões para fechar modais
+        document.querySelectorAll('.closeModal').forEach(button => {
+            button.addEventListener('click', closeAllModals);
+        });
+
+        // Fechar modais ao clicar fora
+        Object.values(modals).forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeAllModals();
+            });
+        });
+
+        // Funções de manipulação de modais
+        function openModal(modalId) {
+            closeAllModals();
+            modals[modalId].classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            if (modalId === 'modalCharts') {
+                animateChartBars();
+            }
+        }
+
+        function closeAllModals() {
+            Object.values(modals).forEach(modal => {
+                modal.classList.add('hidden');
+            });
+            document.body.style.overflow = '';
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileActionsMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('mobileActionsMenu').classList.add('hidden');
+        }
+
+        // Animação das barras do gráfico quando o modal é aberto
+        function animateChartBars() {
+            setTimeout(() => {
+                const bars = document.querySelectorAll('.chart-bar');
+                bars.forEach(bar => {
+                    const targetHeight = bar.style.getPropertyValue('--target-height');
+                    bar.style.height = '0%';
+                    bar.classList.add('bar-animate');
+                    setTimeout(() => {
+                        bar.style.height = targetHeight;
+                    }, 100);
+                });
+            }, 300);
+        }
+
+        // Alternar ano do gráfico
+        document.getElementById('yearFilter').addEventListener('change', function() {
+            const bars = document.querySelectorAll('.chart-bar');
+            const randomHeights = [
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%',
+                Math.floor(Math.random() * 60) + 20 + '%'
+            ];
+            
+            bars.forEach((bar, index) => {
+                bar.style.setProperty('--target-height', randomHeights[index]);
+                bar.style.height = '0%';
+            });
+            
+            setTimeout(() => {
+                bars.forEach((bar, index) => {
+                    bar.style.height = randomHeights[index];
+                });
+            }, 100);
+        });
+
+        // Carregar código fonte
+        function loadSourceCode() {
+            const sourceCodeElement = document.getElementById('sourceCodeContent');
+            
+            // Obter o código fonte da página atual
+            const htmlContent = document.documentElement.outerHTML;
+            
+            // Escapar caracteres especiais para exibição segura
+            const escapedHtml = htmlContent
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            
+            // Exibir o código fonte
+            sourceCodeElement.textContent = htmlContent;
+        }
+
+        // Atualizar valor com base no serviço selecionado
+        document.getElementById('servicoSelect').addEventListener('change', function() {
+            const valorInput = document.getElementById('valorTotal');
+            const valorSelecionado = this.value;
+            
+            if (valorSelecionado) {
+                // Formatar o valor para o formato brasileiro (R$ 000,00)
+                const valorFormatado = parseFloat(valorSelecionado).toFixed(2).replace('.', ',');
+                valorInput.value = valorFormatado;
+            } else {
+                valorInput.value = '';
+            }
+        });
+
+        // Atualizar valor com base no serviço selecionado (modal de edição)
+        document.getElementById('editServicoSelect').addEventListener('change', function() {
+            const valorInput = document.getElementById('editValorTotal');
+            const valorSelecionado = this.value;
+            
+            if (valorSelecionado) {
+                // Formatar o valor para o formato brasileiro (R$ 000,00)
+                const valorFormatado = parseFloat(valorSelecionado).toFixed(2).replace('.', ',');
+                valorInput.value = valorFormatado;
+            } else {
+                valorInput.value = '';
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9555041910e1e017',t:'MTc1MDg2MDI4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
