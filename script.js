@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     modalManageServices: document.getElementById('modalManageServices'),
     modalEditService: document.getElementById('modalEditService'),
     modalDeleteService: document.getElementById('modalDeleteService'),
+    modalEditGoal: document.getElementById('modalEditGoal'),
   };
 
   // Botões para abrir modais
@@ -374,6 +375,31 @@ document.addEventListener('DOMContentLoaded', function () {
     'Concluído',
     'Entregue',
   ];
+
+  // --- GRÁFICO DE LUCROS ---
+  // Exemplo de dados dinâmicos (pode ser substituído depois)
+  const chartData = {
+    anos: [2025],
+    meses: [
+      'Jan',
+      'Fev',
+      'Mar',
+      'Abr',
+      'Mai',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Set',
+      'Out',
+      'Nov',
+      'Dez',
+    ],
+    valoresPorAno: {
+      2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    meta: 0, // valor de meta para linha de referência (zerado)
+  };
+
   // Atualizar IDs para português
   function fillSelectOptions() {
     const selects = [
@@ -429,30 +455,6 @@ document.addEventListener('DOMContentLoaded', function () {
         updateChart(this.value);
       });
   }
-
-  // --- GRÁFICO DE LUCROS ---
-  // Exemplo de dados dinâmicos (pode ser substituído depois)
-  const chartData = {
-    anos: [2025],
-    meses: [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez',
-    ],
-    valoresPorAno: {
-      2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    },
-    meta: 0, // valor de meta para linha de referência (zerado)
-  };
 
   function fillYearFilter() {
     const yearFilter = document.getElementById('filtroAno');
@@ -765,6 +767,56 @@ document.addEventListener('DOMContentLoaded', function () {
       v = v.replace('.', ',');
       v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
       this.value = v;
+    });
+  }
+
+  // Botão Editar Meta
+  const btnEditGoal = document.getElementById('btnEditGoal');
+  if (btnEditGoal) {
+    btnEditGoal.addEventListener('click', () => {
+      openModal('modalEditGoal');
+      // Aqui pode-se carregar a meta atual via AJAX futuramente
+    });
+  }
+
+  // --- CAMPOS DE ANO E MÊS NO MODAL DE META ---
+  function fillMetaAno() {
+    const selectAno = document.getElementById('inputMetaAno');
+    if (!selectAno) return;
+    selectAno.innerHTML = '';
+    const anoAtual = new Date().getFullYear();
+    for (let i = anoAtual - 2; i <= anoAtual + 2; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = i;
+      if (i === anoAtual) opt.selected = true;
+      selectAno.appendChild(opt);
+    }
+  }
+  if (document.getElementById('inputMetaAno')) fillMetaAno();
+
+  // Ao abrir o modal de meta, setar ano/mês atuais como padrão
+  if (btnEditGoal) {
+    btnEditGoal.addEventListener('click', () => {
+      openModal('modalEditGoal');
+      fillMetaAno();
+      const mesAtual = new Date().getMonth() + 1;
+      const selectMes = document.getElementById('inputMetaMes');
+      if (selectMes) selectMes.value = mesAtual;
+      // Aqui pode-se carregar a meta atual via AJAX futuramente
+    });
+  }
+
+  // Clique em salvar meta (agora captura ano, mês e mensal)
+  const btnSalvarMeta = document.getElementById('btnSalvarMeta');
+  if (btnSalvarMeta) {
+    btnSalvarMeta.addEventListener('click', function () {
+      const ano = document.getElementById('inputMetaAno').value;
+      const mes = document.getElementById('inputMetaMes').value;
+      const mensal = document.getElementById('inputMetaMensal').value;
+      // Aqui você pode integrar com meta_update.php via AJAX, enviando ano, mes, mensal
+      alert(`Meta salva! Ano: ${ano}, Mês: ${mes}, Mensal: ${mensal}`);
+      closeAllModals();
     });
   }
 });

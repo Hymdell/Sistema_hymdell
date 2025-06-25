@@ -46,7 +46,7 @@
         <!-- Painel de Controle -->
         <div class="dark-texture rounded-lg p-4 mb-6 shadow-lg animate-slideUp">
             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="w-full md:w-1/3 relative">
+                <div class="w-full md:w-56 relative">
                     <input type="text" placeholder="Buscar por OS, cliente, serviço..." class="w-full pl-10 pr-4 py-2 rounded-md text-sm focus:outline-none">
                     <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -80,6 +80,19 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                         <span class="hidden md:inline">Ver Gráficos</span>
+                    </button>
+
+                    <button id="btnEditGoal" class="flex items-center bg-dark-elevated hover:bg-dark-surface px-3 py-2 rounded-md text-sm transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-1 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke-width="2" />
+                            <circle cx="12" cy="12" r="6" stroke-width="2" />
+                            <circle cx="12" cy="12" r="2" stroke-width="2" fill="currentColor" />
+                            <line x1="12" y1="2" x2="12" y2="6" stroke-width="2" />
+                            <line x1="12" y1="18" x2="12" y2="22" stroke-width="2" />
+                            <line x1="2" y1="12" x2="6" y2="12" stroke-width="2" />
+                            <line x1="18" y1="12" x2="22" y2="12" stroke-width="2" />
+                        </svg>
+                        <span class="hidden md:inline">Editar Meta</span>
                     </button>
                 </div>
             </div>
@@ -562,6 +575,58 @@
                         <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
                         <button id="btnConfirmarExcluirServico" class="px-4 py-2 rounded-md bg-status-red text-white hover:bg-opacity-90 transition-colors duration-200">Excluir</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Meta -->
+    <div id="modalEditGoal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="dark-texture rounded-lg shadow-xl w-full max-w-md animate-slideUp">
+                <div class="p-4 border-b border-dark-base flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-white">Editar Meta de Lucro</h3>
+                    <button class="closeModal text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Ano</label>
+                            <select id="inputMetaAno" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                                <!-- Opções preenchidas via JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+                            <select id="inputMetaMes" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none">
+                                <option value="1">Janeiro</option>
+                                <option value="2">Fevereiro</option>
+                                <option value="3">Março</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Maio</option>
+                                <option value="6">Junho</option>
+                                <option value="7">Julho</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Meta Mensal</label>
+                            <input type="text" id="inputMetaMensal" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="R$ 0,00">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-dark-base flex justify-end space-x-3">
+                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
+                    <button id="btnSalvarMeta" class="px-4 py-2 rounded-md bg-accent-amber text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar Meta</button>
                 </div>
             </div>
         </div>
