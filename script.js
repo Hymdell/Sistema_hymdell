@@ -226,8 +226,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const prefix = isEdit ? 'edit' : '';
     const errors = [];
     const getValue = (id) => {
-      const el = document.getElementById(prefix + id);
-      return el ? el.value.trim() : '';
+      const el = document.getElementById(
+        prefix ? prefix + id.charAt(0).toUpperCase() + id.slice(1) : id
+      );
+      return el && typeof el.value === 'string' ? el.value.trim() : '';
     };
     const clientName = getValue('clientName');
     const attendant = getValue('attendant');
