@@ -620,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Recupera o ID do chamado a partir do modal (exemplo: pode ser salvo em um atributo data-id)
       const osId = btnDeletarChamado.getAttribute('data-id');
       if (!osId) {
-        alert('ID do chamado não encontrado.');
+        showSnackbar('ID do chamado não encontrado.', 'error');
         return;
       }
       fetch('chamados_delete.php', {
@@ -631,16 +631,20 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('Chamado excluído com sucesso!');
+            showSnackbar('Chamado excluído com sucesso!', 'success');
             closeAllModals();
-            // Atualize a tabela de OS aqui, se necessário
+            carregarChamados();
           } else {
-            alert(
-              'Erro ao excluir chamado: ' + (data.error || 'Erro desconhecido.')
+            showSnackbar(
+              'Erro ao excluir chamado: ' +
+                (data.error || 'Erro desconhecido.'),
+              'error'
             );
           }
         })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
+        .catch(() =>
+          showSnackbar('Erro de comunicação com o servidor.', 'error')
+        );
     });
   }
 
@@ -739,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .value.replace('.', '')
         .replace(',', '.');
       if (!nome || isNaN(parseFloat(valor)) || isNaN(parseFloat(comissao))) {
-        alert('Preencha todos os campos corretamente.');
+        showSnackbar('Preencha todos os campos corretamente.', 'error');
         return;
       }
       fetch('servicos_update.php', {
@@ -750,17 +754,20 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('Serviço atualizado com sucesso!');
+            showSnackbar('Serviço atualizado com sucesso!', 'success');
             closeAllModals();
             carregarServicos();
           } else {
-            alert(
+            showSnackbar(
               'Erro ao atualizar serviço: ' +
-                (data.error || 'Erro desconhecido.')
+                (data.error || 'Erro desconhecido.'),
+              'error'
             );
           }
         })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
+        .catch(() =>
+          showSnackbar('Erro de comunicação com o servidor.', 'error')
+        );
     });
   }
 
@@ -779,16 +786,20 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('Serviço excluído com sucesso!');
+            showSnackbar('Serviço excluído com sucesso!', 'success');
             closeAllModals();
             carregarServicos();
           } else {
-            alert(
-              'Erro ao excluir serviço: ' + (data.error || 'Erro desconhecido.')
+            showSnackbar(
+              'Erro ao excluir serviço: ' +
+                (data.error || 'Erro desconhecido.'),
+              'error'
             );
           }
         })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
+        .catch(() =>
+          showSnackbar('Erro de comunicação com o servidor.', 'error')
+        );
     });
   }
 
@@ -861,7 +872,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const mes = document.getElementById('inputMetaMes').value;
       const mensal = document.getElementById('inputMetaMensal').value;
       // Aqui você pode integrar com meta_update.php via AJAX, enviando ano, mes, mensal
-      alert(`Meta salva! Ano: ${ano}, Mês: ${mes}, Mensal: ${mensal}`);
+      showSnackbar(
+        `Meta salva! Ano: ${ano}, Mês: ${mes}, Mensal: ${mensal}`,
+        'success'
+      );
       closeAllModals();
     });
   }
@@ -1094,15 +1108,18 @@ document.addEventListener('DOMContentLoaded', function () {
       let mensal = document.getElementById('inputMetaMensal').value;
       mensal = mensal.replace(/\./g, '').replace(',', '.');
       if (!ano || !mes || !mensal || isNaN(Number(mensal))) {
-        alert('Preencha todos os campos corretamente.');
+        showSnackbar('Preencha todos os campos corretamente.', 'error');
         return;
       }
       inserirOuAtualizarMeta(ano, mes, mensal).then((res) => {
         if (res.success) {
-          alert('Meta salva com sucesso!');
+          showSnackbar('Meta salva com sucesso!', 'success');
           closeAllModals();
         } else {
-          alert('Erro ao salvar meta: ' + (res.error || 'Erro desconhecido.'));
+          showSnackbar(
+            'Erro ao salvar meta: ' + (res.error || 'Erro desconhecido.'),
+            'error'
+          );
         }
       });
     });
@@ -1137,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('Serviço adicionado com sucesso!');
+            showSnackbar('Serviço adicionado com sucesso!', 'success');
             closeAllModals();
             // Limpar formulário
             serviceName.value = '';
@@ -1147,13 +1164,16 @@ document.addEventListener('DOMContentLoaded', function () {
             carregarServicos();
             fillSelectOptions();
           } else {
-            alert(
+            showSnackbar(
               'Erro ao adicionar serviço: ' +
-                (data.error || 'Erro desconhecido.')
+                (data.error || 'Erro desconhecido.'),
+              'error'
             );
           }
         })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
+        .catch(() =>
+          showSnackbar('Erro de comunicação com o servidor.', 'error')
+        );
     });
   }
 
@@ -1235,7 +1255,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .then((res) => res.json())
       .then((data) => {
         const os = data.find((c) => String(c.id) === String(id));
-        if (!os) return alert('OS não encontrada!');
+        if (!os) return showSnackbar('OS não encontrada!', 'error');
         osEditandoId = os.id;
         document.getElementById('editOsNumber').textContent = os.numero_os
           ? `#${os.numero_os}`
@@ -1360,16 +1380,19 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('Ordem de Serviço atualizada com sucesso!');
+            showSnackbar('Ordem de Serviço atualizada com sucesso!', 'success');
             closeAllModals();
             carregarChamados();
           } else {
-            alert(
-              'Erro ao atualizar OS: ' + (data.error || 'Erro desconhecido.')
+            showSnackbar(
+              'Erro ao atualizar OS: ' + (data.error || 'Erro desconhecido.'),
+              'error'
             );
           }
         })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
+        .catch(() =>
+          showSnackbar('Erro de comunicação com o servidor.', 'error')
+        );
     });
   }
 
@@ -1389,16 +1412,19 @@ document.addEventListener('DOMContentLoaded', function () {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          alert('Chamado excluído com sucesso!');
+          showSnackbar('Chamado excluído com sucesso!', 'success');
           closeAllModals();
           carregarChamados();
         } else {
-          alert(
-            'Erro ao excluir chamado: ' + (data.error || 'Erro desconhecido.')
+          showSnackbar(
+            'Erro ao excluir chamado: ' + (data.error || 'Erro desconhecido.'),
+            'error'
           );
         }
       })
-      .catch(() => alert('Erro de comunicação com o servidor.'));
+      .catch(() =>
+        showSnackbar('Erro de comunicação com o servidor.', 'error')
+      );
   }
 
   // --- ADIÇÃO DE OS (CHAMADO) ---
@@ -1453,16 +1479,62 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('Ordem de Serviço adicionada com sucesso!');
+            showSnackbar('Ordem de Serviço adicionada com sucesso!', 'success');
             closeAllModals();
             carregarChamados();
           } else {
-            alert(
-              'Erro ao adicionar OS: ' + (data.error || 'Erro desconhecido.')
+            showSnackbar(
+              'Erro ao adicionar OS: ' + (data.error || 'Erro desconhecido.'),
+              'error'
             );
           }
         })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
+        .catch(() =>
+          showSnackbar('Erro de comunicação com o servidor.', 'error')
+        );
     });
+  }
+
+  // --- SNACKBAR VISUAL ---
+  function showSnackbar(message, type = 'info') {
+    let snackbar = document.getElementById('snackbarCustom');
+    if (!snackbar) {
+      snackbar = document.createElement('div');
+      snackbar.id = 'snackbarCustom';
+      snackbar.style.position = 'fixed';
+      snackbar.style.bottom = '32px';
+      snackbar.style.left = '50%';
+      snackbar.style.transform = 'translateX(-50%)';
+      snackbar.style.minWidth = '240px';
+      snackbar.style.maxWidth = '90vw';
+      snackbar.style.padding = '16px 32px';
+      snackbar.style.borderRadius = '8px';
+      snackbar.style.fontSize = '1rem';
+      snackbar.style.fontWeight = 'bold';
+      snackbar.style.zIndex = '9999';
+      snackbar.style.boxShadow = '0 2px 16px rgba(0,0,0,0.2)';
+      snackbar.style.textAlign = 'center';
+      snackbar.style.opacity = '0';
+      snackbar.style.pointerEvents = 'none';
+      document.body.appendChild(snackbar);
+    }
+    // Cores por tipo
+    let bg = '#2196f3',
+      color = '#fff';
+    if (type === 'success') {
+      bg = '#22c55e'; // verde
+    } else if (type === 'error') {
+      bg = '#ef4444'; // vermelho
+    } else if (type === 'warning') {
+      bg = '#f59e42'; // laranja
+    }
+    snackbar.style.background = bg;
+    snackbar.style.color = color;
+    snackbar.textContent = message;
+    snackbar.style.transition = 'opacity 0.3s';
+    snackbar.style.opacity = '1';
+    setTimeout(() => {
+      snackbar.style.opacity = '0';
+    }, 3000);
   }
 });
