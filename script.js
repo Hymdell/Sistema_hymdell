@@ -14,289 +14,287 @@ document.addEventListener('DOMContentLoaded', function () {
   let servicoEditandoId = null;
   let servicoExcluindoId = null;
   let osEditandoId = null;
-  let visaoGrafico = 'anual';
-  document
-    .getElementById('btnAddOS')
-    .addEventListener('click', () => openModal('modalAddOS'));
-  document
-    .getElementById('btnAddService')
-    .addEventListener('click', () => openModal('modalAddService'));
-  document
-    .getElementById('btnViewCharts')
-    .addEventListener('click', () => openModal('modalCharts'));
-  document.getElementById('btnManageServices').addEventListener('click', () => {
-    openModal('modalManageServices');
-    carregarServicos();
-  });
-  document
-    .getElementById('btnMobileActions')
-    .addEventListener('click', toggleMobileMenu);
-  document.getElementById('btnMobileAddOS').addEventListener('click', () => {
-    openModal('modalAddOS');
-    closeMobileMenu();
-  });
-  document
-    .getElementById('btnMobileAddService')
-    .addEventListener('click', () => {
-      openModal('modalAddService');
-      closeMobileMenu();
-    });
-  document
-    .getElementById('btnMobileViewCharts')
-    .addEventListener('click', () => {
+  let availableChartDates = {};
+
+  function setupEventListeners() {
+    document
+      .getElementById('btnAddOS')
+      .addEventListener('click', () => openModal('modalAddOS'));
+    document
+      .getElementById('btnAddService')
+      .addEventListener('click', () => openModal('modalAddService'));
+    document.getElementById('btnViewCharts').addEventListener('click', () => {
       openModal('modalCharts');
+      carregarDadosGraficoEAtualizar();
+    });
+    document
+      .getElementById('btnManageServices')
+      .addEventListener('click', () => {
+        openModal('modalManageServices');
+        carregarServicos();
+      });
+    document
+      .getElementById('btnMobileActions')
+      .addEventListener('click', toggleMobileMenu);
+    document.getElementById('btnMobileAddOS').addEventListener('click', () => {
+      openModal('modalAddOS');
       closeMobileMenu();
     });
-  document.querySelectorAll('.closeModal').forEach((button) => {
-    button.addEventListener('click', closeAllModals);
-  });
-  Object.values(modals).forEach((modal) => {
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeAllModals();
+    document
+      .getElementById('btnMobileAddService')
+      .addEventListener('click', () => {
+        openModal('modalAddService');
+        closeMobileMenu();
+      });
+    document
+      .getElementById('btnMobileViewCharts')
+      .addEventListener('click', () => {
+        openModal('modalCharts');
+        carregarDadosGraficoEAtualizar();
+        closeMobileMenu();
+      });
+    document.querySelectorAll('.closeModal').forEach((button) => {
+      button.addEventListener('click', closeAllModals);
+    });
+    Object.values(modals).forEach((modal) => {
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeAllModals();
+        });
+      }
+    });
+    const selectServico = document.getElementById('selectServico');
+    if (selectServico) {
+      selectServico.addEventListener('change', atualizarValorTotalOS);
+    }
+    const selectServicoEditar = document.getElementById('selectServicoEditar');
+    if (selectServicoEditar) {
+      selectServicoEditar.addEventListener('change', atualizarValorTotalEditOS);
+    }
+    maskPhone(document.getElementById('phone'));
+    maskPhone(document.getElementById('editPhone'));
+    const servicePrice = document.getElementById('servicePrice');
+    if (servicePrice) {
+      maskMoney(servicePrice);
+    }
+    const btnUpdateCommission = document.getElementById('btnUpdateCommission');
+    if (btnUpdateCommission) {
+      btnUpdateCommission.addEventListener('click', function () {
+        let valor = servicePrice.value.replace(/\./g, '').replace(',', '.');
+        valor = parseFloat(valor);
+        if (!isNaN(valor)) {
+          serviceCommission.value = (valor / 2).toFixed(2).replace('.', ',');
+        } else {
+          serviceCommission.value = '';
+        }
       });
     }
-  });
+    const btnSalvarServico = document.querySelector(
+      '#modalAddService .bg-accent-amber'
+    );
+    if (btnSalvarServico) {
+      btnSalvarServico.addEventListener('click', handleSalvarServico);
+    }
+    const btnDeletarChamado = document.getElementById('btnDeletarChamado');
+    if (btnDeletarChamado) {
+      btnDeletarChamado.addEventListener('click', function () {
+        const osId = this.getAttribute('data-id');
+        if (osId) excluirChamado(osId);
+      });
+    }
+    const searchServicoInput = document.getElementById('searchServico');
+    if (searchServicoInput) {
+      searchServicoInput.addEventListener('input', (e) =>
+        renderizarServicos(e.target.value)
+      );
+    }
+    const btnSalvarEdicaoServico = document.getElementById(
+      'btnSalvarEdicaoServico'
+    );
+    if (btnSalvarEdicaoServico) {
+      btnSalvarEdicaoServico.addEventListener(
+        'click',
+        handleSalvarEdicaoServico
+      );
+    }
+    const btnExcluirServicoDoModal = document.getElementById(
+      'btnExcluirServicoDoModal'
+    );
+    if (btnExcluirServicoDoModal) {
+      btnExcluirServicoDoModal.addEventListener('click', () => {
+        servicoExcluindoId = servicoEditandoId;
+        closeAllModals();
+        openModal('modalDeleteService');
+      });
+    }
+    const btnConfirmarExcluirServico = document.getElementById(
+      'btnConfirmarExcluirServico'
+    );
+    if (btnConfirmarExcluirServico) {
+      btnConfirmarExcluirServico.addEventListener(
+        'click',
+        handleConfirmarExcluirServico
+      );
+    }
+    const editServicePrice = document.getElementById('editServicePrice');
+    if (editServicePrice) maskMoney(editServicePrice);
+    const editServiceCommission = document.getElementById(
+      'editServiceCommission'
+    );
+    if (editServiceCommission) maskMoney(editServiceCommission);
+    const btnEditGoal = document.getElementById('btnEditGoal');
+    if (btnEditGoal) {
+      btnEditGoal.addEventListener('click', handleAbrirModalMeta);
+    }
+    const btnSalvarMeta = document.getElementById('btnSalvarMeta');
+    if (btnSalvarMeta) {
+      btnSalvarMeta.addEventListener('click', handleSalvarMeta);
+    }
+    const chartYearFilter = document.getElementById('chartYearFilter');
+    const chartMonthFilter = document.getElementById('chartMonthFilter');
+    if (chartYearFilter && chartMonthFilter) {
+      chartYearFilter.addEventListener('change', () => {
+        popularFiltroMesGrafico(Number(chartYearFilter.value));
+        carregarDadosGraficoEAtualizar();
+      });
+      chartMonthFilter.addEventListener(
+        'change',
+        carregarDadosGraficoEAtualizar
+      );
+    }
+    const searchOsInput = document.getElementById('searchOsInput');
+    if (searchOsInput) {
+      searchOsInput.addEventListener('input', (e) =>
+        renderizarChamados(e.target.value)
+      );
+    }
+    const btnSalvarEdicaoOS = document.querySelector(
+      '#modalEditOS .bg-accent-blue'
+    );
+    if (btnSalvarEdicaoOS) {
+      btnSalvarEdicaoOS.addEventListener('click', handleSalvarEdicaoOS);
+    }
+    const btnSalvarOS = document.querySelector('#modalAddOS .bg-accent-blue');
+    if (btnSalvarOS) {
+      btnSalvarOS.addEventListener('click', handleSalvarOS);
+    }
+  }
 
   function openModal(modalId) {
     closeAllModals();
     if (modals[modalId]) {
       modals[modalId].classList.remove('hidden');
       document.body.style.overflow = 'hidden';
-      if (modalId === 'modalCharts') {
-        animateChartBars();
-      }
     }
   }
 
   function closeAllModals() {
     Object.values(modals).forEach((modal) => {
-      if (modal) {
-        modal.classList.add('hidden');
-      }
+      if (modal) modal.classList.add('hidden');
     });
     document.body.style.overflow = '';
   }
 
   function toggleMobileMenu() {
-    const menu = document.getElementById('mobileActionsMenu');
-    menu.classList.toggle('hidden');
+    document.getElementById('mobileActionsMenu').classList.toggle('hidden');
   }
 
   function closeMobileMenu() {
     document.getElementById('mobileActionsMenu').classList.add('hidden');
   }
 
-  function animateChartBars() {
-    setTimeout(() => {
-      const bars = document.querySelectorAll('.chart-bar');
-      bars.forEach((bar) => {
-        const targetHeight = bar.style.getPropertyValue('--target-height');
-        bar.style.height = '0%';
-        bar.classList.add('bar-animate');
-        setTimeout(() => {
-          bar.style.height = targetHeight;
-        }, 100);
-      });
-    }, 300);
-  }
-  const filtroAnoGrafico = document.getElementById('filtroAno');
-  if (filtroAnoGrafico) {
-    filtroAnoGrafico.addEventListener('change', function () {
-      const bars = document.querySelectorAll('.chart-bar');
-      const randomHeights = [
-        Math.floor(Math.random() * 60) + 20 + '%',
-        Math.floor(Math.random() * 60) + 20 + '%',
-        Math.floor(Math.random() * 60) + 20 + '%',
-        Math.floor(Math.random() * 60) + 20 + '%',
-        Math.floor(Math.random() * 60) + 20 + '%',
-        Math.floor(Math.random() * 60) + 20 + '%',
-      ];
-      bars.forEach((bar, index) => {
-        bar.style.setProperty('--target-height', randomHeights[index]);
-        bar.style.height = '0%';
-      });
-      setTimeout(() => {
-        bars.forEach((bar, index) => {
-          bar.style.height = randomHeights[index];
-        });
-      }, 100);
-    });
-  }
-
   function atualizarValorTotalOS() {
-    const selectServico = document.getElementById('selectServico');
+    const select = document.getElementById('selectServico');
     const valorInput = document.getElementById('valorTotal');
-    const selectedOption = selectServico.options[selectServico.selectedIndex];
-    const valorBase = selectedOption.getAttribute('data-valor');
-    if (!valorBase) {
-      valorInput.value = '';
-      return;
-    }
-    valorInput.value = parseFloat(valorBase).toFixed(2).replace('.', ',');
-  }
-  const selectServico = document.getElementById('selectServico');
-  if (selectServico) {
-    selectServico.addEventListener('change', atualizarValorTotalOS);
+    const selectedOption = select.options[select.selectedIndex];
+    valorInput.value = selectedOption.dataset.valor
+      ? parseFloat(selectedOption.dataset.valor).toFixed(2).replace('.', ',')
+      : '';
   }
 
   function atualizarValorTotalEditOS() {
-    const selectServicoEditar = document.getElementById('selectServicoEditar');
+    const select = document.getElementById('selectServicoEditar');
     const valorInput = document.getElementById('valorTotalEditar');
-    const selectedOption =
-      selectServicoEditar.options[selectServicoEditar.selectedIndex];
-    const valorBase = selectedOption.getAttribute('data-valor');
-    if (!valorBase) {
-      valorInput.value = '';
-      return;
-    }
-    valorInput.value = parseFloat(valorBase).toFixed(2).replace('.', ',');
-  }
-  const selectServicoEditar = document.getElementById('selectServicoEditar');
-  if (selectServicoEditar) {
-    selectServicoEditar.addEventListener('change', atualizarValorTotalEditOS);
+    const selectedOption = select.options[select.selectedIndex];
+    valorInput.value = selectedOption.dataset.valor
+      ? parseFloat(selectedOption.dataset.valor).toFixed(2).replace('.', ',')
+      : '';
   }
 
   function maskPhone(input) {
     if (!input) return;
     input.addEventListener('input', function () {
-      let v = input.value.replace(/\D/g, '');
-      if (v.length > 11) v = v.slice(0, 11);
-      if (v.length > 10) {
-        input.value = v.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-      } else if (v.length > 6) {
-        input.value = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
-      } else if (v.length > 2) {
-        input.value = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
-      } else if (v.length > 0) {
-        input.value = v.replace(/(\d*)/, '($1');
-      } else {
-        input.value = '';
-      }
+      let v = input.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 10)
+        v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+      else if (v.length > 6)
+        v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+      else if (v.length > 2) v = v.replace(/^(\d{2})(\d*)/, '($1) $2');
+      else if (v.length > 0) v = v.replace(/^(\d*)/, '($1');
+      input.value = v;
     });
   }
-
-  function validateOSForm(isEdit = false) {
-    const prefix = isEdit ? 'edit' : '';
-    const errors = [];
-    const getValue = (id) => {
-      const el = document.getElementById(
-        prefix ? prefix + id.charAt(0).toUpperCase() + id.slice(1) : id
-      );
-      return el && typeof el.value === 'string' ? el.value.trim() : '';
-    };
-    const clientName = getValue('clientName');
-    const attendant = getValue('attendant');
-    const item = getValue('item');
-    const entryDate = getValue('entryDate');
-    const defectSolution = getValue('defectSolution');
-    if (!clientName) errors.push('Nome do Cliente é obrigatório.');
-    if (!attendant) errors.push('Atendente é obrigatório.');
-    if (!item) errors.push('Item é obrigatório.');
-    if (!entryDate) errors.push('Data de Entrada é obrigatória.');
-    if (!defectSolution) errors.push('Defeito/Solução é obrigatório.');
-    return errors;
-  }
-
-  function showFormErrors(errors, isEdit = false) {
-    let errorDiv = document.getElementById(
-      isEdit ? 'editOsFormErrors' : 'osFormErrors'
-    );
-    if (!errorDiv) {
-      errorDiv = document.createElement('div');
-      errorDiv.id = isEdit ? 'editOsFormErrors' : 'osFormErrors';
-      errorDiv.className = 'mb-2 text-red-400 text-sm';
-      const form = document.querySelector(
-        isEdit ? '#modalEditOS .modal-content' : '#modalAddOS .modal-content'
-      );
-      form.insertBefore(errorDiv, form.firstChild);
-    }
-    errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
-  }
-
-  function clearFormErrors(isEdit = false) {
-    const errorDiv = document.getElementById(
-      isEdit ? 'editOsFormErrors' : 'osFormErrors'
-    );
-    if (errorDiv) errorDiv.innerHTML = '';
-  }
-  maskPhone(document.getElementById('phone'));
-  maskPhone(document.getElementById('editPhone'));
 
   function maskMoney(input) {
     if (!input) return;
     input.addEventListener('input', function (e) {
       let v = e.target.value.replace(/\D/g, '');
-      v = (v / 100).toFixed(2) + '';
-      v = v.replace('.', ',');
-      v = v.replace(/(\d)(?=(\d{3})+(\d{2})*,)/g, '$1.');
-      e.target.value = v;
-    });
-  }
-  const servicePrice = document.getElementById('servicePrice');
-  const serviceCommission = document.getElementById('serviceCommission');
-  const btnUpdateCommission = document.getElementById('btnUpdateCommission');
-  if (servicePrice) {
-    maskMoney(servicePrice);
-  }
-  if (btnUpdateCommission) {
-    btnUpdateCommission.addEventListener('click', function () {
-      let valor = servicePrice.value.replace(/\./g, '').replace(',', '.');
-      valor = parseFloat(valor);
-      if (!isNaN(valor)) {
-        const metade = (valor / 2).toFixed(2).replace('.', ',');
-        serviceCommission.value = metade;
-      } else {
-        serviceCommission.value = '';
-      }
+      v = (v / 100).toFixed(2).replace('.', ',');
+      e.target.value = v.replace(/(\d)(?=(\d{3})+(\d{2}))/g, '$1.');
     });
   }
 
-  function validateServiceForm() {
+  function validateOSForm(isEdit = false) {
     const errors = [];
-    const nome = document.getElementById('serviceName')
-      ? document.getElementById('serviceName').value.trim()
-      : '';
-    const preco = document.getElementById('servicePrice')
-      ? document.getElementById('servicePrice').value.trim()
-      : '';
-    if (!nome) errors.push('Nome do Serviço é obrigatório.');
-    if (!preco || isNaN(parseFloat(preco.replace(/\./g, '').replace(',', '.'))))
-      errors.push(
-        'Preço Total do Serviço é obrigatório e deve ser um valor válido.'
-      );
+    const getElValue = (id) => {
+      const el = document.getElementById(isEdit ? `edit${id}` : id);
+      return el ? el.value.trim() : '';
+    };
+    if (!getElValue('ClientName'))
+      errors.push('Nome do Cliente é obrigatório.');
+    if (!getElValue('Attendant')) errors.push('Atendente é obrigatório.');
+    if (!getElValue('Item')) errors.push('Item é obrigatório.');
+    if (!getElValue('EntryDate')) errors.push('Data de Entrada é obrigatória.');
+    if (!getElValue('DefectSolution'))
+      errors.push('Defeito/Solução é obrigatório.');
     return errors;
   }
 
-  function showServiceFormErrors(errors) {
-    let errorDiv = document.getElementById('serviceFormErrors');
+  function showFormErrors(errors, isEdit = false) {
+    const modalId = isEdit ? '#modalEditOS' : '#modalAddOS';
+    let errorDiv = document.querySelector(`${modalId} .form-errors`);
     if (!errorDiv) {
       errorDiv = document.createElement('div');
-      errorDiv.id = 'serviceFormErrors';
-      errorDiv.className = 'mb-2 text-red-400 text-sm';
-      const form = document.querySelector('#modalAddService .p-6');
-      form.insertBefore(errorDiv, form.firstChild);
+      errorDiv.className = 'form-errors mb-2 text-red-400 text-sm';
+      document.querySelector(`${modalId} .modal-content`).prepend(errorDiv);
     }
     errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
   }
 
-  function clearServiceFormErrors() {
-    const errorDiv = document.getElementById('serviceFormErrors');
+  function clearFormErrors(isEdit = false) {
+    const modalId = isEdit ? '#modalEditOS' : '#modalAddOS';
+    const errorDiv = document.querySelector(`${modalId} .form-errors`);
     if (errorDiv) errorDiv.innerHTML = '';
   }
-  const btnSalvarServico = document.querySelector(
-    '#modalAddService .bg-accent-amber'
-  );
-  if (btnSalvarServico) {
-    btnSalvarServico.addEventListener('click', function (e) {
-      clearServiceFormErrors();
-      const errors = validateServiceForm();
-      if (errors.length) {
-        showServiceFormErrors(errors);
-        e.preventDefault();
-        return;
-      }
-    });
+
+  function validateServiceForm() {
+    const errors = [];
+    if (!document.getElementById('serviceName').value.trim())
+      errors.push('Nome do Serviço é obrigatório.');
+    const preco = document.getElementById('servicePrice').value.trim();
+    if (!preco || isNaN(parseFloat(preco.replace(/\./g, '').replace(',', '.'))))
+      errors.push('Preço Total é obrigatório e deve ser um valor válido.');
+    return errors;
+  }
+
+  function showServiceFormErrors(errors) {
+    let errorDiv = document.querySelector('#modalAddService .form-errors');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'form-errors mb-2 text-red-400 text-sm';
+      document.querySelector('#modalAddService .p-6').prepend(errorDiv);
+    }
+    errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
   }
 
   function fillSelectOptions() {
@@ -304,33 +302,19 @@ document.addEventListener('DOMContentLoaded', function () {
       .then((res) => res.json())
       .then((servicos) => {
         if (!Array.isArray(servicos)) return;
+        todosOsServicos = servicos;
         servicos.sort((a, b) => a.nome.localeCompare(b.nome));
-        const selectServico = document.getElementById('selectServico');
-        if (selectServico) {
-          selectServico.innerHTML =
-            '<option value="">Selecione um serviço</option>';
-          servicos.forEach((s) => {
-            const o = document.createElement('option');
-            o.value = s.id;
-            o.textContent = s.nome;
-            o.setAttribute('data-valor', s.valor);
-            selectServico.appendChild(o);
-          });
-        }
-        const selectServicoEditar = document.getElementById(
-          'selectServicoEditar'
-        );
-        if (selectServicoEditar) {
-          selectServicoEditar.innerHTML =
-            '<option value="">Selecione um serviço</option>';
-          servicos.forEach((s) => {
-            const o = document.createElement('option');
-            o.value = s.id;
-            o.textContent = s.nome;
-            o.setAttribute('data-valor', s.valor);
-            selectServicoEditar.appendChild(o);
-          });
-        }
+        ['selectServico', 'selectServicoEditar'].forEach((selectId) => {
+          const select = document.getElementById(selectId);
+          if (select) {
+            select.innerHTML = '<option value="">Selecione um serviço</option>';
+            servicos.forEach((s) => {
+              const o = new Option(s.nome, s.id);
+              o.dataset.valor = s.valor;
+              select.add(o);
+            });
+          }
+        });
       });
     const statusList = [
       'Diagnosticando',
@@ -339,645 +323,418 @@ document.addEventListener('DOMContentLoaded', function () {
       'Aguardando Retirada',
       'Concluído',
     ];
-    const selectStatus = document.getElementById('selectStatus');
-    if (selectStatus) {
-      selectStatus.innerHTML = '';
-      statusList.forEach((s) => {
-        const o = document.createElement('option');
-        o.value = s;
-        o.textContent = s;
-        selectStatus.appendChild(o);
-      });
-    }
-    const selectStatusEditar = document.getElementById('selectStatusEditar');
-    if (selectStatusEditar) {
-      selectStatusEditar.innerHTML = '';
-      statusList.forEach((s) => {
-        const o = document.createElement('option');
-        o.value = s;
-        o.textContent = s;
-        selectStatusEditar.appendChild(o);
-      });
-    }
+    ['selectStatus', 'selectStatusEditar'].forEach((selectId) => {
+      const select = document.getElementById(selectId);
+      if (select) {
+        select.innerHTML = '';
+        statusList.forEach((s) => select.add(new Option(s, s)));
+      }
+    });
   }
-  fillSelectOptions();
-  const chartData = {
-    anos: [new Date().getFullYear()],
-    meses: [
-      'Jan',
-      'Fev',
-      'Mar',
-      'Abr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Set',
-      'Out',
-      'Nov',
-      'Dez',
-    ],
-    valoresPorAno: {
-      [new Date().getFullYear()]: Array(12).fill(0),
-    },
-    meta: 0,
-  };
 
-  function fillYearFilter() {
-    const yearFilter = document.getElementById('filtroAno');
+  function popularFiltrosGrafico() {
+    availableChartDates = {};
+    todasAsOrdens
+      .filter(
+        (os) =>
+          os.status === 'Concluído' && (os.data_saida || os.data_atualizacao)
+      )
+      .forEach((os) => {
+        const dataFim = new Date(os.data_saida || os.data_atualizacao);
+        if (!isNaN(dataFim.getTime())) {
+          const ano = dataFim.getFullYear();
+          const mes = dataFim.getMonth() + 1;
+          if (!availableChartDates[ano]) {
+            availableChartDates[ano] = new Set();
+          }
+          availableChartDates[ano].add(mes);
+        }
+      });
+    const yearFilter = document.getElementById('chartYearFilter');
     if (!yearFilter) return;
+    const anos = Object.keys(availableChartDates).sort((a, b) => b - a);
     yearFilter.innerHTML = '';
-    chartData.anos.forEach((ano) => {
-      const opt = document.createElement('option');
-      opt.value = ano;
-      opt.textContent = ano;
-      yearFilter.appendChild(opt);
-    });
-  }
-
-  function fillChartYAxis(maxValue) {
-    const yAxis = document.getElementById('chartYAxis');
-    if (!yAxis) return;
-    yAxis.innerHTML = '';
-    const maxVal = maxValue > 0 ? maxValue : 1000;
-    for (let i = 5; i >= 0; i--) {
-      const valor = Math.round((maxVal * i) / 5);
-      const span = document.createElement('span');
-      span.textContent = 'R$ ' + valor.toLocaleString('pt-BR');
-      yAxis.appendChild(span);
-    }
-  }
-
-  function fillChartXAxis() {
-    const xAxis = document.getElementById('chartXAxis');
-    if (!xAxis) return;
-    xAxis.innerHTML = '';
-    chartData.meses.forEach((mes) => {
-      const span = document.createElement('span');
-      span.textContent = mes;
-      xAxis.appendChild(span);
-    });
-  }
-
-  function fillChartReferenceLines() {
-    const refLines = document.getElementById('chartReferenceLines');
-    if (!refLines) return;
-    refLines.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
-      const div = document.createElement('div');
-      div.className = 'border-b border-dark-base border-opacity-30 h-0';
-      refLines.appendChild(div);
-    }
-  }
-
-  function fillChartBars(ano) {
-    const barsContainer = document.getElementById('chartBarsContainer');
-    if (!barsContainer) return;
-    barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
-    const valores = chartData.valoresPorAno[ano] || [];
-    const max = Math.max(...valores, chartData.meta || 0);
-    const maxVal = max > 0 ? max : 1;
-    valores.forEach((valor) => {
-      const bar = document.createElement('div');
-      bar.className = 'flex-1 flex items-end justify-center';
-      const barInner = document.createElement('div');
-      barInner.className =
-        'w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
-      const altura = (valor / maxVal) * 90;
-      barInner.style.setProperty('--target-height', altura + '%');
-      barInner.style.height = '0%';
-      bar.appendChild(barInner);
-      barsContainer.appendChild(bar);
-    });
-    const goalLine = document.getElementById('chartGoalLine');
-    if (goalLine) {
-      const meta = chartData.meta || 0;
-      if (meta > 0 && max > 0) {
-        const metaPercent = (meta / max) * 90;
-        goalLine.style.bottom = metaPercent + '%';
-        goalLine.style.display = '';
-      } else {
-        goalLine.style.display = 'none';
-      }
-    }
-  }
-
-  function updateChart(ano) {
-    const valores = chartData.valoresPorAno[ano] || [];
-    const max = Math.max(...valores, chartData.meta || 0);
-    fillChartYAxis(max);
-    fillChartXAxis();
-    fillChartReferenceLines();
-    fillChartBars(ano);
-    const total = valores.reduce((acc, v) => acc + v, 0);
-    const totalSpan = document.getElementById('chartTotalPeriodo');
-    if (totalSpan) {
-      totalSpan.textContent =
-        total === 0
-          ? '-'
-          : 'R$ ' +
-            total.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-            });
-    }
-  }
-  if (document.getElementById('filtroAno')) {
-    fillYearFilter();
-    updateChart(chartData.anos[0]);
-    document
-      .getElementById('filtroAno')
-      .addEventListener('change', function () {
-        updateChart(this.value);
-      });
-  }
-  const btnDeletarChamado = document.getElementById('btnDeletarChamado');
-  if (btnDeletarChamado) {
-    btnDeletarChamado.addEventListener('click', function () {
-      const osId = btnDeletarChamado.getAttribute('data-id');
-      if (!osId) {
-        showSnackbar('ID do chamado não encontrado.', 'error');
-        return;
-      }
-      excluirChamado(osId);
-    });
-  }
-
-  function renderizarServicos(filtro = '') {
-    const servicesTableBody = document.getElementById('servicesTableBody');
-    if (!servicesTableBody) return;
-    const termoBusca = filtro.toLowerCase();
-    const servicosFiltrados = todosOsServicos.filter((servico) =>
-      servico.nome.toLowerCase().includes(termoBusca)
-    );
-    servicosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
-    servicesTableBody.innerHTML = '';
-    if (servicosFiltrados.length > 0) {
-      servicosFiltrados.forEach((servico) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-                    <td class="px-4 py-2 text-gray-200">${servico.nome}</td>
-                    <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
-                      servico.valor
-                    ).toLocaleString('pt-BR', {
-                      minimumFractionDigits: 2,
-                    })}</td>
-                    <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
-                      servico.comissao
-                    ).toLocaleString('pt-BR', {
-                      minimumFractionDigits: 2,
-                    })}</td>
-                    <td class="px-4 py-2 text-center">
-                        <button class="btn-editar-servico text-accent-blue hover:underline" data-id="${
-                          servico.id
-                        }">Editar</button>
-                    </td>`;
-        servicesTableBody.appendChild(tr);
-      });
+    if (anos.length === 0) {
+      const anoAtual = new Date().getFullYear();
+      yearFilter.add(new Option(anoAtual, anoAtual));
     } else {
-      servicesTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 py-4">${
-        filtro ? 'Nenhum serviço encontrado.' : 'Nenhum serviço cadastrado.'
-      }</td></tr>`;
+      anos.forEach((ano) => yearFilter.add(new Option(ano, ano)));
     }
-    document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
-      btn.addEventListener('click', function () {
-        servicoEditandoId = this.getAttribute('data-id');
-        const servico = todosOsServicos.find((s) => s.id == servicoEditandoId);
-        if (servico) {
-          document.getElementById('editServiceName').value = servico.nome;
-          document.getElementById('editServicePrice').value = parseFloat(
-            servico.valor
-          ).toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-          });
-          document.getElementById('editServiceCommission').value = parseFloat(
-            servico.comissao
-          ).toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-          });
-          openModal('modalEditService');
-        }
-      });
-    });
+    popularFiltroMesGrafico(Number(yearFilter.value));
   }
 
-  function carregarServicos() {
-    fetch('servicos_select.php')
-      .then((res) => res.json())
-      .then((data) => {
-        todosOsServicos = Array.isArray(data) ? data : [];
-        renderizarServicos();
-      })
-      .catch(() => {
-        const servicesTableBody = document.getElementById('servicesTableBody');
-        if (servicesTableBody) {
-          servicesTableBody.innerHTML =
-            '<tr><td colspan="4" class="text-center text-red-400 py-4">Erro ao carregar serviços.</td></tr>';
-        }
+  function popularFiltroMesGrafico(ano) {
+    const monthFilter = document.getElementById('chartMonthFilter');
+    if (!monthFilter) return;
+    const mesesDisponiveis = availableChartDates[ano]
+      ? [...availableChartDates[ano]].sort((a, b) => a - b)
+      : [];
+    const nomesMeses = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
+    ];
+    monthFilter.innerHTML = '';
+    if (mesesDisponiveis.length > 0) {
+      mesesDisponiveis.forEach((mes) => {
+        monthFilter.add(new Option(nomesMeses[mes - 1], mes));
       });
-  }
-  const searchServicoInput = document.getElementById('searchServico');
-  if (searchServicoInput) {
-    searchServicoInput.addEventListener('input', (e) => {
-      renderizarServicos(e.target.value);
-    });
-  }
-  const btnSalvarEdicaoServico = document.getElementById(
-    'btnSalvarEdicaoServico'
-  );
-  if (btnSalvarEdicaoServico) {
-    btnSalvarEdicaoServico.addEventListener('click', function () {
-      const nome = document.getElementById('editServiceName').value.trim();
-      const valor = document
-        .getElementById('editServicePrice')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      const comissao = document
-        .getElementById('editServiceCommission')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      if (!nome || isNaN(parseFloat(valor)) || isNaN(parseFloat(comissao))) {
-        showSnackbar('Preencha todos os campos corretamente.', 'error');
-        return;
-      }
-      fetch('servicos_update.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: servicoEditandoId,
-          nome,
-          valor,
-          comissao,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            showSnackbar('Serviço atualizado com sucesso!', 'success');
-            closeAllModals();
-            carregarServicos();
-            fillSelectOptions();
-          } else {
-            showSnackbar(
-              'Erro ao atualizar serviço: ' +
-                (data.error || 'Erro desconhecido.'),
-              'error'
-            );
-          }
-        })
-        .catch(() =>
-          showSnackbar('Erro de comunicação com o servidor.', 'error')
-        );
-    });
-  }
-  const btnExcluirServicoDoModal = document.getElementById(
-    'btnExcluirServicoDoModal'
-  );
-  if (btnExcluirServicoDoModal) {
-    btnExcluirServicoDoModal.addEventListener('click', function () {
-      servicoExcluindoId = servicoEditandoId;
-      closeModal('modalEditService');
-      openModal('modalDeleteService');
-    });
-  }
-  const btnConfirmarExcluirServico = document.getElementById(
-    'btnConfirmarExcluirServico'
-  );
-  if (btnConfirmarExcluirServico) {
-    btnConfirmarExcluirServico.addEventListener('click', function () {
-      if (!servicoExcluindoId) return;
-      fetch('servicos_delete.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: servicoExcluindoId,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            showSnackbar('Serviço excluído com sucesso!', 'success');
-            closeAllModals();
-            carregarServicos();
-            fillSelectOptions();
-          } else {
-            showSnackbar(
-              'Erro ao excluir serviço: ' +
-                (data.error || 'Erro desconhecido.'),
-              'error'
-            );
-          }
-        })
-        .catch(() =>
-          showSnackbar('Erro de comunicação com o servidor.', 'error')
-        );
-    });
-  }
-  const editServicePrice = document.getElementById('editServicePrice');
-  const editServiceCommission = document.getElementById(
-    'editServiceCommission'
-  );
-  if (editServicePrice) maskMoney(editServicePrice);
-  if (editServiceCommission) maskMoney(editServiceCommission);
-  const btnEditGoal = document.getElementById('btnEditGoal');
-  if (btnEditGoal) {
-    btnEditGoal.addEventListener('click', () => {
-      openModal('modalEditGoal');
-    });
-  }
-
-  function fillMetaAno() {
-    const selectAno = document.getElementById('inputMetaAno');
-    if (!selectAno) return;
-    selectAno.innerHTML = '';
-    const anoAtual = new Date().getFullYear();
-    for (let i = anoAtual - 2; i <= anoAtual + 2; i++) {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = i;
-      if (i === anoAtual) opt.selected = true;
-      selectAno.appendChild(opt);
-    }
-  }
-  if (document.getElementById('inputMetaAno')) fillMetaAno();
-  if (btnEditGoal) {
-    btnEditGoal.addEventListener('click', () => {
-      openModal('modalEditGoal');
-      fillMetaAno();
       const mesAtual = new Date().getMonth() + 1;
-      const selectMes = document.getElementById('inputMetaMes');
-      if (selectMes) selectMes.value = mesAtual;
-    });
+      if (mesesDisponiveis.includes(mesAtual)) {
+        monthFilter.value = mesAtual;
+      }
+    } else {
+      monthFilter.add(new Option('Nenhum registro', ''));
+    }
   }
-  const btnSalvarMeta = document.getElementById('btnSalvarMeta');
-  if (btnSalvarMeta) {
-    btnSalvarMeta.addEventListener('click', function () {
-      const ano = document.getElementById('inputMetaAno').value;
-      const mes = document.getElementById('inputMetaMes').value;
-      const mensal = document.getElementById('inputMetaMensal').value;
-      showSnackbar(
-        `Meta salva! Ano: ${ano}, Mês: ${mes}, Mensal: ${mensal}`,
-        'success'
+  async function carregarDadosGraficoEAtualizar() {
+    const yearFilter = document.getElementById('chartYearFilter');
+    const monthFilter = document.getElementById('chartMonthFilter');
+    const chartContent = document.getElementById('chartContent');
+    const totalPeriodo = document.getElementById('chartTotalPeriodo');
+    const metaDisplay = document.getElementById('chartMetaDisplay');
+    if (
+      !yearFilter ||
+      !monthFilter ||
+      !chartContent ||
+      !totalPeriodo ||
+      !metaDisplay
+    )
+      return;
+    if (!yearFilter.value || !monthFilter.value) {
+      chartContent.innerHTML =
+        '<p class="text-gray-400 m-auto">Nenhum dado de lucro para o período selecionado.</p>';
+      totalPeriodo.textContent = 'R$ 0,00';
+      metaDisplay.textContent = '';
+      return;
+    }
+    const ano = Number(yearFilter.value);
+    const mes = Number(monthFilter.value);
+    try {
+      const [metaObj] = await Promise.all([buscarMeta(ano, mes)]);
+      const servicosMap = new Map(
+        (todosOsServicos || []).map((s) => [s.id, s])
       );
-      closeAllModals();
-    });
-  }
-
-  function getDiasNoMes(ano, mes) {
-    return new Date(ano, mes, 0).getDate();
-  }
-  const chartDataDiario = {
-    2025: {
-      6: Array.from(
-        {
-          length: 30,
-        },
-        (_, i) => Math.floor(Math.random() * 500)
-      ),
-      7: Array.from(
-        {
-          length: 31,
-        },
-        (_, i) => Math.floor(Math.random() * 500)
-      ),
-    },
-  };
-
-  function fillChartXAxisDias(ano, mes) {
-    const xAxis = document.getElementById('chartXAxis');
-    if (!xAxis) return;
-    xAxis.innerHTML = '';
-    const dias = getDiasNoMes(ano, mes);
-    for (let d = 1; d <= dias; d++) {
-      const span = document.createElement('span');
-      span.textContent = d;
-      xAxis.appendChild(span);
-    }
-  }
-
-  function fillChartBarsDias(ano, mes) {
-    const barsContainer = document.getElementById('chartBarsContainer');
-    if (!barsContainer) return;
-    barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
-    const valores = (chartDataDiario[ano] && chartDataDiario[ano][mes]) || [];
-    const max = Math.max(...valores, chartData.meta || 0);
-    const maxVal = max > 0 ? max : 1;
-    valores.forEach((valor) => {
-      const bar = document.createElement('div');
-      bar.className = 'flex-1 flex items-end justify-center';
-      const barInner = document.createElement('div');
-      barInner.className =
-        'w-4 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
-      const altura = (valor / maxVal) * 90;
-      barInner.style.setProperty('--target-height', altura + '%');
-      barInner.style.height = '0%';
-      bar.appendChild(barInner);
-      barsContainer.appendChild(bar);
-    });
-    const goalLine = document.getElementById('chartGoalLine');
-    if (goalLine) {
-      const meta = chartData.meta || 0;
-      if (meta > 0 && max > 0) {
-        const metaPercent = (meta / max) * 90;
-        goalLine.style.bottom = metaPercent + '%';
-        goalLine.style.display = '';
+      const lucrosPorServico = {};
+      todasAsOrdens
+        .filter((os) => {
+          const dataFim = new Date(os.data_saida || os.data_atualizacao);
+          return (
+            os.status === 'Concluído' &&
+            !isNaN(dataFim.getTime()) &&
+            dataFim.getFullYear() === ano &&
+            dataFim.getMonth() + 1 === mes
+          );
+        })
+        .forEach((os) => {
+          const servico = servicosMap.get(os.servico_id);
+          const servicoNome = servico ? servico.nome : 'Serviço Avulso';
+          const comissao = servico
+            ? servico.comissao
+            : (parseFloat(os.valor_total) || 0) / 2;
+          const lucro =
+            os.tipo_recebimento === 'integral'
+              ? parseFloat(os.valor_total) || 0
+              : parseFloat(comissao) || 0;
+          lucrosPorServico[servicoNome] =
+            (lucrosPorServico[servicoNome] || 0) + lucro;
+        });
+      if (metaObj && metaObj.valor > 0) {
+        metaDisplay.innerHTML = `Meta do Mês: <span class="font-semibold text-accent-amber">R$ ${parseFloat(
+          metaObj.valor
+        ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>`;
       } else {
-        goalLine.style.display = 'none';
+        metaDisplay.innerHTML = ``;
       }
-    }
-  }
-
-  function updateChartDiario(ano, mes) {
-    const valores = (chartDataDiario[ano] && chartDataDiario[ano][mes]) || [];
-    const max = Math.max(...valores, chartData.meta || 0);
-    fillChartYAxis(max);
-    fillChartXAxisDias(ano, mes);
-    fillChartReferenceLines();
-    fillChartBarsDias(ano, mes);
-    const total = valores.reduce((acc, v) => acc + v, 0);
-    const totalSpan = document.getElementById('chartTotalPeriodo');
-    if (totalSpan) {
-      totalSpan.textContent =
-        total === 0
-          ? '-'
-          : 'R$ ' +
-            total.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-            });
-    }
-  }
-  if (
-    document.getElementById('filtroAno') &&
-    document.getElementById('filtroMes')
-  ) {
-    const filtroAno = document.getElementById('filtroAno');
-    const filtroMes = document.getElementById('filtroMes');
-    filtroMes.value = (new Date().getMonth() + 1).toString();
-    const toggleVisaoGrafico = document.getElementById('toggleVisaoGrafico');
-
-    function atualizarVisaoGrafico() {
-      if (visaoGrafico === 'anual') {
-        if (toggleVisaoGrafico) toggleVisaoGrafico.textContent = 'Anual';
-        filtroMes.disabled = true;
-        updateChart(Number(filtroAno.value));
+      if (Object.keys(lucrosPorServico).length > 0) {
+        renderizarGraficoPizza(lucrosPorServico);
       } else {
-        if (toggleVisaoGrafico) toggleVisaoGrafico.textContent = 'Mensal';
-        filtroMes.disabled = false;
-        updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
+        chartContent.innerHTML =
+          '<p class="text-gray-400 m-auto">Nenhum dado de lucro para o período selecionado.</p>';
+        totalPeriodo.textContent = 'R$ 0,00';
       }
+    } catch (error) {
+      showSnackbar('Erro ao carregar dados do gráfico.', 'error');
     }
-    if (toggleVisaoGrafico) {
-      toggleVisaoGrafico.addEventListener('click', function () {
-        visaoGrafico = visaoGrafico === 'anual' ? 'mensal' : 'anual';
-        atualizarVisaoGrafico();
-      });
-    }
-    filtroAno.addEventListener('change', atualizarVisaoGrafico);
-    filtroMes.addEventListener('change', function () {
-      if (visaoGrafico === 'mensal') atualizarVisaoGrafico();
-    });
-    filtroMes.disabled = true;
-    atualizarVisaoGrafico();
   }
 
-  function buscarMeta(ano, mes) {
-    return fetch('meta_select.php')
-      .then((res) => res.json())
-      .then((metas) => {
-        if (!Array.isArray(metas)) return null;
-        return metas.find(
-          (m) => Number(m.ano) === Number(ano) && Number(m.mes) === Number(mes)
-        );
-      });
+  function renderizarGraficoPizza(dados) {
+    const chartContent = document.getElementById('chartContent');
+    chartContent.innerHTML = `<div id="pieChartContainer" class="w-64 h-64 rounded-full flex-shrink-0"></div>
+                              <div id="pieChartLegend" class="flex flex-col gap-2 self-center md:self-start"></div>`;
+    const pieContainer = document.getElementById('pieChartContainer');
+    const legendContainer = document.getElementById('pieChartLegend');
+    const totalLucro = Object.values(dados).reduce(
+      (sum, value) => sum + value,
+      0
+    );
+    document.getElementById(
+      'chartTotalPeriodo'
+    ).textContent = `R$ ${totalLucro.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+    })}`;
+    if (totalLucro === 0) {
+      chartContent.innerHTML =
+        '<p class="text-gray-400 m-auto">Nenhum lucro registrado para este mês.</p>';
+      return;
+    }
+    const colors = [
+      '#A3D5FF',
+      '#FFB84C',
+      '#4CAF50',
+      '#F44336',
+      '#9c27b0',
+      '#3f51b5',
+      '#00bcd4',
+      '#ff9800',
+    ];
+    let accumulatedPercent = 0;
+    const gradientParts = Object.entries(dados).map(([label, value], index) => {
+      const percent = (value / totalLucro) * 100;
+      const color = colors[index % colors.length];
+      const startAngle = accumulatedPercent;
+      accumulatedPercent += percent;
+      const endAngle = accumulatedPercent;
+      const legendItem = document.createElement('div');
+      legendItem.className = 'flex items-center gap-3 text-sm';
+      legendItem.innerHTML = `<div class="w-4 h-4 rounded" style="background-color: ${color}"></div>
+                                <div>
+                                    <span class="font-semibold">${label}</span>
+                                    <span class="text-gray-400 ml-2">${percent.toFixed(
+                                      1
+                                    )}%</span>
+                                    <div class="text-xs text-gray-300">R$ ${value.toLocaleString(
+                                      'pt-BR',
+                                      { minimumFractionDigits: 2 }
+                                    )}</div>
+                                </div>`;
+      legendContainer.appendChild(legendItem);
+      return `${color} ${startAngle}% ${endAngle}%`;
+    });
+    pieContainer.style.background = `conic-gradient(${gradientParts.join(
+      ', '
+    )})`;
+  }
+  async function buscarMeta(ano, mes) {
+    try {
+      const res = await fetch(`meta_select.php?ano=${ano}&mes=${mes}`);
+      if (!res.ok) return null;
+      const metas = await res.json();
+      return Array.isArray(metas)
+        ? metas.find(
+            (m) =>
+              Number(m.ano) === Number(ano) && Number(m.mes) === Number(mes)
+          )
+        : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   function inserirOuAtualizarMeta(ano, mes, valor) {
     return buscarMeta(ano, mes).then((meta) => {
       const formData = new FormData();
-      if (meta) {
+      formData.append('valor', valor);
+      let url = 'meta_insert.php';
+      if (meta && meta.id) {
         formData.append('id', meta.id);
-        formData.append('valor', valor);
-        return fetch('meta_update.php', {
-          method: 'POST',
-          body: formData,
-        }).then((res) => res.json());
+        url = 'meta_update.php';
       } else {
         formData.append('ano', ano);
         formData.append('mes', mes);
-        formData.append('valor', valor);
-        return fetch('meta_insert.php', {
-          method: 'POST',
-          body: formData,
-        }).then((res) => res.json());
       }
-    });
-  }
-  if (btnEditGoal) {
-    btnEditGoal.addEventListener('click', () => {
-      openModal('modalEditGoal');
-      fillMetaAno();
-      const mesAtual = new Date().getMonth() + 1;
-      const selectMes = document.getElementById('inputMetaMes');
-      const selectAno = document.getElementById('inputMetaAno');
-      if (selectMes) selectMes.value = mesAtual;
-      const inputMetaMensal = document.getElementById('inputMetaMensal');
-      const carregarMeta = (ano, mes) => {
-        buscarMeta(ano, mes).then((meta) => {
-          inputMetaMensal.value = meta
-            ? Number(meta.valor).toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-              })
-            : '';
-          inputMetaMensal.setAttribute('data-meta-id', meta ? meta.id : '');
-        });
-      };
-      if (selectAno && selectMes) {
-        carregarMeta(selectAno.value, selectMes.value);
-        selectAno.addEventListener('change', () =>
-          carregarMeta(selectAno.value, selectMes.value)
-        );
-        selectMes.addEventListener('change', () =>
-          carregarMeta(selectAno.value, selectMes.value)
-        );
-      }
-    });
-  }
-  if (btnSalvarMeta) {
-    btnSalvarMeta.addEventListener('click', function () {
-      const ano = document.getElementById('inputMetaAno').value;
-      const mes = document.getElementById('inputMetaMes').value;
-      let mensal = document
-        .getElementById('inputMetaMensal')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      if (!ano || !mes || !mensal || isNaN(Number(mensal))) {
-        showSnackbar('Preencha todos os campos corretamente.', 'error');
-        return;
-      }
-      inserirOuAtualizarMeta(ano, mes, mensal).then((res) => {
-        if (res.success) {
-          showSnackbar('Meta salva com sucesso!', 'success');
-          closeAllModals();
-        } else {
-          showSnackbar(
-            'Erro ao salvar meta: ' + (res.error || 'Erro desconhecido.'),
-            'error'
-          );
-        }
-      });
-    });
-  }
-  if (btnSalvarServico) {
-    btnSalvarServico.addEventListener('click', function (e) {
-      clearServiceFormErrors();
-      const errors = validateServiceForm();
-      if (errors.length) {
-        showServiceFormErrors(errors);
-        e.preventDefault();
-        return;
-      }
-      const nome = document.getElementById('serviceName').value.trim();
-      const valor = document
-        .getElementById('servicePrice')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      const comissao = document
-        .getElementById('serviceCommission')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      const formData = new FormData();
-      formData.append('nome', nome);
-      formData.append('valor', valor);
-      formData.append('comissao', comissao);
-      fetch('servicos_insert.php', {
+      return fetch(url, {
         method: 'POST',
         body: formData,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            showSnackbar('Serviço adicionado com sucesso!', 'success');
-            closeAllModals();
-            document.getElementById('serviceName').value = '';
-            document.getElementById('servicePrice').value = '';
-            document.getElementById('serviceCommission').value = '';
-            carregarServicos();
-            fillSelectOptions();
-          } else {
-            showSnackbar(
-              'Erro ao adicionar serviço: ' +
-                (data.error || 'Erro desconhecido.'),
-              'error'
-            );
-          }
-        })
-        .catch(() =>
-          showSnackbar('Erro de comunicação com o servidor.', 'error')
-        );
+      }).then((res) => res.json());
     });
+  }
+
+  function handleAbrirModalMeta() {
+    openModal('modalEditGoal');
+    fillMetaAnoSelect();
+    const mesAtual = new Date().getMonth() + 1;
+    const selectMes = document.getElementById('inputMetaMes');
+    const selectAno = document.getElementById('inputMetaAno');
+    if (selectMes) selectMes.value = mesAtual;
+    const inputMetaMensal = document.getElementById('inputMetaMensal');
+    const carregarMeta = async (ano, mes) => {
+      const meta = await buscarMeta(ano, mes);
+      inputMetaMensal.value = meta
+        ? parseFloat(meta.valor).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+          })
+        : '';
+    };
+    if (selectAno && selectMes) {
+      carregarMeta(selectAno.value, selectMes.value);
+      selectAno.addEventListener('change', () =>
+        carregarMeta(selectAno.value, selectMes.value)
+      );
+      selectMes.addEventListener('change', () =>
+        carregarMeta(selectAno.value, selectMes.value)
+      );
+    }
+  }
+
+  function fillMetaAnoSelect() {
+    const selectAno = document.getElementById('inputMetaAno');
+    if (!selectAno) return;
+    selectAno.innerHTML = '';
+    const anoAtual = new Date().getFullYear();
+    for (let i = anoAtual - 2; i <= anoAtual + 2; i++) {
+      selectAno.add(new Option(i, i));
+    }
+    selectAno.value = anoAtual;
+  }
+  const btnEditGoal = document.getElementById('btnEditGoal');
+  if (btnEditGoal) {
+    btnEditGoal.addEventListener('click', handleAbrirModalMeta);
+  }
+
+  function handleSalvarMeta() {
+    const ano = document.getElementById('inputMetaAno').value;
+    const mes = document.getElementById('inputMetaMes').value;
+    let mensal = document
+      .getElementById('inputMetaMensal')
+      .value.replace(/\./g, '')
+      .replace(',', '.');
+    if (!ano || !mes || !mensal || isNaN(Number(mensal))) {
+      showSnackbar('Preencha todos os campos corretamente.', 'error');
+      return;
+    }
+    inserirOuAtualizarMeta(ano, mes, mensal).then((res) => {
+      if (res.success) {
+        showSnackbar('Meta salva com sucesso!', 'success');
+        closeAllModals();
+        carregarDadosGraficoEAtualizar();
+      } else {
+        showSnackbar(
+          'Erro ao salvar meta: ' + (res.error || 'Erro desconhecido.'),
+          'error'
+        );
+      }
+    });
+  }
+  const btnSalvarMeta = document.getElementById('btnSalvarMeta');
+  if (btnSalvarMeta) {
+    btnSalvarMeta.addEventListener('click', handleSalvarMeta);
+  }
+
+  function handleSalvarServico(e) {
+    const serviceNameEl = document.getElementById('serviceName');
+    const servicePriceEl = document.getElementById('servicePrice');
+    const serviceCommissionEl = document.getElementById('serviceCommission');
+    e.preventDefault();
+    clearFormErrors(false, 'serviceFormErrors');
+    const errors = validateServiceForm();
+    if (errors.length) {
+      showServiceFormErrors(errors);
+      return;
+    }
+    const formData = new FormData();
+    formData.append('nome', serviceNameEl.value.trim());
+    formData.append(
+      'valor',
+      servicePriceEl.value.replace(/\./g, '').replace(',', '.')
+    );
+    formData.append(
+      'comissao',
+      serviceCommissionEl.value.replace(/\./g, '').replace(',', '.')
+    );
+    fetch('servicos_insert.php', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          showSnackbar('Serviço adicionado com sucesso!', 'success');
+          closeAllModals();
+          [serviceNameEl, servicePriceEl, serviceCommissionEl].forEach(
+            (el) => (el.value = '')
+          );
+          carregarServicos();
+          fillSelectOptions();
+        } else {
+          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
+        }
+      })
+      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+  }
+
+  function handleSalvarEdicaoServico() {
+    const nome = document.getElementById('editServiceName').value.trim();
+    const valor = document
+      .getElementById('editServicePrice')
+      .value.replace(/\./g, '')
+      .replace(',', '.');
+    const comissao = document
+      .getElementById('editServiceCommission')
+      .value.replace(/\./g, '')
+      .replace(',', '.');
+    if (!nome || isNaN(parseFloat(valor)) || isNaN(parseFloat(comissao))) {
+      showSnackbar('Preencha todos os campos corretamente.', 'error');
+      return;
+    }
+    fetch('servicos_update.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: servicoEditandoId,
+        nome,
+        valor,
+        comissao,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          showSnackbar('Serviço atualizado!', 'success');
+          closeAllModals();
+          carregarServicos();
+          fillSelectOptions();
+        } else {
+          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
+        }
+      })
+      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+  }
+
+  function handleConfirmarExcluirServico() {
+    if (!servicoExcluindoId) return;
+    fetch('servicos_delete.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: servicoExcluindoId,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          showSnackbar('Serviço excluído!', 'success');
+          closeAllModals();
+          carregarServicos();
+          fillSelectOptions();
+        } else {
+          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
+        }
+      })
+      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
   }
 
   function renderizarChamados(filtro = '') {
@@ -997,23 +754,25 @@ document.addEventListener('DOMContentLoaded', function () {
     osTableBody.innerHTML = '';
     if (ordensFiltradas.length > 0) {
       ordensFiltradas.forEach((os) => {
-        function formatarDataHora(dataStr) {
+        const tr = document.createElement('tr');
+        tr.className =
+          'os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30';
+        const formatarDataHora = (dataStr) => {
           if (!dataStr) return '-';
           const dataObj = new Date(dataStr);
-          if (isNaN(dataObj.getTime())) return '-';
-          return dataObj
-            .toLocaleString('pt-BR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-            .replace(',', ' às');
-        }
-
-        function getStatusBadge(status) {
-          if (!status) return '';
+          return isNaN(dataObj.getTime())
+            ? '-'
+            : dataObj
+                .toLocaleString('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+                .replace(',', ' às');
+        };
+        const getStatusBadge = (status) => {
           const statusStyles = {
             Diagnosticando: 'bg-status-blue-bg text-status-blue-text',
             'Aguardando Cliente':
@@ -1022,21 +781,17 @@ document.addEventListener('DOMContentLoaded', function () {
             'Aguardando Retirada': 'bg-status-slate-bg text-status-slate-text',
             Concluído: 'bg-status-green bg-opacity-20 text-status-green',
           };
-          const styleClass =
-            statusStyles[status] || 'bg-gray-200 text-gray-800';
-          return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${styleClass}">${status}</span>`;
-        }
-        let valor = '-';
-        if (os.valor_total != null && !isNaN(parseFloat(os.valor_total))) {
-          valor =
-            'R$ ' +
-            parseFloat(os.valor_total).toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-            });
-        }
-        const tr = document.createElement('tr');
-        tr.className =
-          'os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30';
+          return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${
+            statusStyles[status] || 'bg-gray-200 text-gray-800'
+          }">${status || ''}</span>`;
+        };
+        const valor =
+          os.valor_total != null && !isNaN(parseFloat(os.valor_total))
+            ? 'R$ ' +
+              parseFloat(os.valor_total).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+              })
+            : '-';
         tr.innerHTML = `
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
                           os.numero_os || '-'
@@ -1075,35 +830,25 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-
-  function carregarChamados() {
-    fetch('chamados_select.php')
-      .then((res) => res.json())
-      .then((data) => {
-        todasAsOrdens = Array.isArray(data) ? data : [];
-        renderizarChamados();
-      })
-      .catch(() => {
-        const osTableBody = document.getElementById('osTableBody');
-        if (osTableBody)
-          osTableBody.innerHTML =
-            '<tr><td colspan="8" class="text-center text-red-400 py-4">Erro ao carregar OS.</td></tr>';
-      });
-  }
-  carregarChamados();
-  const searchOsInput = document.getElementById('searchOsInput');
-  if (searchOsInput) {
-    searchOsInput.addEventListener('input', (e) => {
-      renderizarChamados(e.target.value);
-    });
+  async function carregarDadosIniciais() {
+    try {
+      const [chamadosData, servicosData] = await Promise.all([
+        fetch('chamados_select.php').then((res) => res.json()),
+        fetch('servicos_select.php').then((res) => res.json()),
+      ]);
+      todasAsOrdens = Array.isArray(chamadosData) ? chamadosData : [];
+      todosOsServicos = Array.isArray(servicosData) ? servicosData : [];
+      renderizarChamados();
+      fillSelectOptions();
+      popularFiltrosGrafico();
+    } catch (error) {
+      showSnackbar('Erro ao carregar dados iniciais.', 'error');
+    }
   }
 
   function abrirModalEditarOS(id) {
     const os = todasAsOrdens.find((c) => String(c.id) === String(id));
-    if (!os) {
-      showSnackbar('OS não encontrada!', 'error');
-      return;
-    }
+    if (!os) return showSnackbar('OS não encontrada!', 'error');
     osEditandoId = os.id;
     document.getElementById('editOsNumber').textContent = os.numero_os
       ? `#${os.numero_os}`
@@ -1133,63 +878,54 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnDeletarChamado').setAttribute('data-id', os.id);
     openModal('modalEditOS');
   }
-  const btnSalvarEdicaoOS = document.querySelector(
-    '#modalEditOS .bg-accent-blue'
-  );
-  if (btnSalvarEdicaoOS) {
-    btnSalvarEdicaoOS.addEventListener('click', function (e) {
-      clearFormErrors(true);
-      const errors = validateOSForm(true);
-      if (errors.length) {
-        showFormErrors(errors, true);
-        e.preventDefault();
-        return;
-      }
-      const payload = {
-        id: osEditandoId,
-        numero_os: document.getElementById('editOsInput').value.trim(),
-        cliente: document.getElementById('editClientName').value.trim(),
-        atendente: document.getElementById('editAttendant').value.trim(),
-        telefone: document.getElementById('editPhone').value.trim(),
-        item: document.getElementById('editItem').value.trim(),
-        data_entrada: document.getElementById('editEntryDate').value,
-        data_saida: document.getElementById('editExitDate').value,
-        defeito_solucao: document
-          .getElementById('editDefectSolution')
-          .value.trim(),
-        servico_id: document.getElementById('selectServicoEditar').value,
-        tipo_recebimento: document.getElementById('selectRecebimentoEditar')
-          .value,
-        valor_total: document
-          .getElementById('valorTotalEditar')
-          .value.replace(/\./g, '')
-          .replace(',', '.'),
-        status: document.getElementById('selectStatusEditar').value,
-      };
-      fetch('chamados_update.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+
+  function handleSalvarEdicaoOS(e) {
+    e.preventDefault();
+    clearFormErrors(true);
+    const errors = validateOSForm(true);
+    if (errors.length) {
+      showFormErrors(errors, true);
+      return;
+    }
+    const payload = {
+      id: osEditandoId,
+      numero_os: document.getElementById('editOsInput').value.trim(),
+      cliente: document.getElementById('editClientName').value.trim(),
+      atendente: document.getElementById('editAttendant').value.trim(),
+      telefone: document.getElementById('editPhone').value.trim(),
+      item: document.getElementById('editItem').value.trim(),
+      data_entrada: document.getElementById('editEntryDate').value,
+      data_saida: document.getElementById('editExitDate').value,
+      defeito_solucao: document
+        .getElementById('editDefectSolution')
+        .value.trim(),
+      servico_id: document.getElementById('selectServicoEditar').value,
+      tipo_recebimento: document.getElementById('selectRecebimentoEditar')
+        .value,
+      valor_total: document
+        .getElementById('valorTotalEditar')
+        .value.replace(/\./g, '')
+        .replace(',', '.'),
+      status: document.getElementById('selectStatusEditar').value,
+    };
+    fetch('chamados_update.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          showSnackbar('Ordem de Serviço atualizada!', 'success');
+          closeAllModals();
+          carregarDadosIniciais();
+        } else {
+          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
+        }
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            showSnackbar('Ordem de Serviço atualizada com sucesso!', 'success');
-            closeAllModals();
-            carregarChamados();
-          } else {
-            showSnackbar(
-              'Erro ao atualizar OS: ' + (data.error || 'Erro desconhecido.'),
-              'error'
-            );
-          }
-        })
-        .catch(() =>
-          showSnackbar('Erro de comunicação com o servidor.', 'error')
-        );
-    });
+      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
   }
 
   function excluirChamado(id) {
@@ -1211,71 +947,59 @@ document.addEventListener('DOMContentLoaded', function () {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          showSnackbar('Chamado excluído com sucesso!', 'success');
+          showSnackbar('Chamado excluído!', 'success');
           closeAllModals();
-          carregarChamados();
+          carregarDadosIniciais();
         } else {
-          showSnackbar(
-            'Erro ao excluir chamado: ' + (data.error || 'Erro desconhecido.'),
-            'error'
-          );
+          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
         }
       })
-      .catch(() =>
-        showSnackbar('Erro de comunicação com o servidor.', 'error')
-      );
+      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
   }
-  const btnSalvarOS = document.querySelector('#modalAddOS .bg-accent-blue');
-  if (btnSalvarOS) {
-    btnSalvarOS.addEventListener('click', function (e) {
-      clearFormErrors();
-      const errors = validateOSForm();
-      if (errors.length) {
-        showFormErrors(errors);
-        e.preventDefault();
-        return;
-      }
-      const payload = {
-        numero_os: document.getElementById('osNumber').value.trim(),
-        cliente: document.getElementById('clientName').value.trim(),
-        atendente: document.getElementById('attendant').value.trim(),
-        telefone: document.getElementById('phone').value.trim(),
-        item: document.getElementById('item').value.trim(),
-        data_entrada: document.getElementById('entryDate').value,
-        data_saida: document.getElementById('exitDate').value,
-        defeito_solucao: document.getElementById('defectSolution').value.trim(),
-        servico_id: document.getElementById('selectServico').value,
-        tipo_recebimento: document.getElementById('selectRecebimento').value,
-        valor_total: document
-          .getElementById('valorTotal')
-          .value.replace(/\./g, '')
-          .replace(',', '.'),
-        status: document.getElementById('selectStatus').value,
-      };
-      fetch('chamados_insert.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+
+  function handleSalvarOS(e) {
+    e.preventDefault();
+    clearFormErrors();
+    const errors = validateOSForm();
+    if (errors.length) {
+      showFormErrors(errors);
+      return;
+    }
+    const payload = {
+      numero_os: document.getElementById('osNumber').value.trim(),
+      cliente: document.getElementById('clientName').value.trim(),
+      atendente: document.getElementById('attendant').value.trim(),
+      telefone: document.getElementById('phone').value.trim(),
+      item: document.getElementById('item').value.trim(),
+      data_entrada: document.getElementById('entryDate').value,
+      data_saida: document.getElementById('exitDate').value,
+      defeito_solucao: document.getElementById('defectSolution').value.trim(),
+      servico_id: document.getElementById('selectServico').value,
+      tipo_recebimento: document.getElementById('selectRecebimento').value,
+      valor_total: document
+        .getElementById('valorTotal')
+        .value.replace(/\./g, '')
+        .replace(',', '.'),
+      status: document.getElementById('selectStatus').value,
+    };
+    fetch('chamados_insert.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          showSnackbar('Ordem de Serviço adicionada!', 'success');
+          closeAllModals();
+          carregarDadosIniciais();
+        } else {
+          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
+        }
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            showSnackbar('Ordem de Serviço adicionada com sucesso!', 'success');
-            closeAllModals();
-            carregarChamados();
-          } else {
-            showSnackbar(
-              'Erro ao adicionar OS: ' + (data.error || 'Erro desconhecido.'),
-              'error'
-            );
-          }
-        })
-        .catch(() =>
-          showSnackbar('Erro de comunicação com o servidor.', 'error')
-        );
-    });
+      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
   }
 
   function showSnackbar(message, type = 'info') {
@@ -1301,4 +1025,6 @@ document.addEventListener('DOMContentLoaded', function () {
       snackbar.style.opacity = '0';
     }, 3000);
   }
+  setupEventListeners();
+  carregarDadosIniciais();
 });
