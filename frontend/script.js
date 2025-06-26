@@ -23,12 +23,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document
       .getElementById('btnAddService')
       .addEventListener('click', () => openModal('modalAddService'));
-    // Adiciona o evento do botão de atualizar listas
     const btnAtualizarListas = document.getElementById('btnAtualizarListas');
     if (btnAtualizarListas) {
       btnAtualizarListas.addEventListener('click', () => {
-        carregarDadosIniciais();
-        showSnackbar('Listas atualizadas!', 'success');
+        showSnackbar('Atualizando dados...', 'info');
+        carregarDadosIniciais().then(() => {
+          if (!modals.modalCharts.classList.contains('hidden')) {
+            carregarDadosGraficoEAtualizar();
+          }
+          showSnackbar('Dados atualizados!', 'success');
+        });
       });
     }
     document.getElementById('btnViewCharts').addEventListener('click', () => {
@@ -39,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .getElementById('btnManageServices')
       .addEventListener('click', () => {
         openModal('modalManageServices');
-        carregarServicos();
+        renderizarServicos();
       });
     document
       .getElementById('btnMobileActions')
@@ -90,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
       btnUpdateCommission.addEventListener('click', function () {
         let valor = servicePrice.value.replace(/\./g, '').replace(',', '.');
         valor = parseFloat(valor);
+        const serviceCommission = document.getElementById('serviceCommission');
         if (!isNaN(valor)) {
           serviceCommission.value = (valor / 2).toFixed(2).replace('.', ',');
         } else {
@@ -507,9 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const gradientParts = Object.entries(dados).map(([label, value], index) => {
       const percent = (value / totalLucro) * 100;
       const color = colors[index % colors.length];
-      const startAngle = accumulatedPercent;
       accumulatedPercent += percent;
-      const endAngle = accumulatedPercent;
       const legendItem = document.createElement('div');
       legendItem.className = 'flex items-center gap-3 text-sm';
       legendItem.innerHTML = `<div class="w-4 h-4 rounded" style="background-color: ${color}"></div>
@@ -524,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     )}</div>
                                 </div>`;
       legendContainer.appendChild(legendItem);
-      return `${color} ${startAngle}% ${endAngle}%`;
+      return `${color} ${accumulatedPercent - percent}% ${accumulatedPercent}%`;
     });
     pieContainer.style.background = `conic-gradient(${gradientParts.join(
       ', '
@@ -533,7 +536,10 @@ document.addEventListener('DOMContentLoaded', function () {
   async function buscarMeta(ano, mes) {
     try {
       const res = await fetch(
-        `../backend/meta/meta_select.php?ano=${ano}&mes=${mes}`
+        `../backend/meta/meta_select.php?ano=${ano}&mes=${mes}`,
+        {
+          cache: 'no-store',
+        }
       );
       if (!res.ok) return null;
       const metas = await res.json();
@@ -791,10 +797,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function carregarServicos() {
-    renderizarServicos();
-  }
-
   function renderizarChamados(filtro = '') {
     const osTableBody = document.getElementById('osTableBody');
     if (!osTableBody) return;
@@ -832,12 +834,11 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const getStatusBadge = (status) => {
           const statusStyles = {
-            Diagnosticando: 'bg-status-blue-bg text-status-blue-text',
-            'Aguardando Cliente':
-              'bg-status-amber bg-opacity-20 text-status-amber',
-            'Aguardando Peça': 'bg-status-fuchsia-bg text-status-fuchsia-text',
-            'Aguardando Retirada': 'bg-status-slate-bg text-status-slate-text',
-            Concluído: 'bg-status-green bg-opacity-20 text-status-green',
+            Diagnosticando: 'bg-blue-500/20 text-blue-500',
+            'Aguardando Cliente': 'bg-orange-500/20 text-orange-500',
+            'Aguardando Peça': 'bg-purple-500/20 text-purple-500',
+            'Aguardando Retirada': 'bg-cyan-500/20 text-cyan-500',
+            Concluído: 'bg-green-500/20 text-green-500',
           };
           return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${
             statusStyles[status] || 'bg-gray-200 text-gray-800'
@@ -891,12 +892,12 @@ document.addEventListener('DOMContentLoaded', function () {
   async function carregarDadosIniciais() {
     try {
       const [chamadosData, servicosData] = await Promise.all([
-        fetch('../backend/chamados/chamados_select.php').then((res) =>
-          res.json()
-        ),
-        fetch('../backend/servicos/servicos_select.php').then((res) =>
-          res.json()
-        ),
+        fetch('../backend/chamados/chamados_select.php', {
+          cache: 'no-store',
+        }).then((res) => res.json()),
+        fetch('../backend/servicos/servicos_select.php', {
+          cache: 'no-store',
+        }).then((res) => res.json()),
       ]);
       todasAsOrdens = Array.isArray(chamadosData) ? chamadosData : [];
       todosOsServicos = Array.isArray(servicosData) ? servicosData : [];
