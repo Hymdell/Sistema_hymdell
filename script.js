@@ -23,6 +23,14 @@ document.addEventListener('DOMContentLoaded', function () {
     document
       .getElementById('btnAddService')
       .addEventListener('click', () => openModal('modalAddService'));
+    // Adiciona o evento do botão de atualizar listas
+    const btnAtualizarListas = document.getElementById('btnAtualizarListas');
+    if (btnAtualizarListas) {
+      btnAtualizarListas.addEventListener('click', () => {
+        carregarDadosIniciais();
+        showSnackbar('Listas atualizadas!', 'success');
+      });
+    }
     document.getElementById('btnViewCharts').addEventListener('click', () => {
       openModal('modalCharts');
       carregarDadosGraficoEAtualizar();
