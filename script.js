@@ -298,24 +298,20 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function fillSelectOptions() {
-    fetch('servicos_select.php')
-      .then((res) => res.json())
-      .then((servicos) => {
-        if (!Array.isArray(servicos)) return;
-        todosOsServicos = servicos;
-        servicos.sort((a, b) => a.nome.localeCompare(b.nome));
-        ['selectServico', 'selectServicoEditar'].forEach((selectId) => {
-          const select = document.getElementById(selectId);
-          if (select) {
-            select.innerHTML = '<option value="">Selecione um serviço</option>';
-            servicos.forEach((s) => {
-              const o = new Option(s.nome, s.id);
-              o.dataset.valor = s.valor;
-              select.add(o);
-            });
-          }
+    if (!Array.isArray(todosOsServicos)) return;
+    const servicos = [...todosOsServicos];
+    servicos.sort((a, b) => a.nome.localeCompare(b.nome));
+    ['selectServico', 'selectServicoEditar'].forEach((selectId) => {
+      const select = document.getElementById(selectId);
+      if (select) {
+        select.innerHTML = '<option value="">Selecione um serviço</option>';
+        servicos.forEach((s) => {
+          const o = new Option(s.nome, s.id);
+          o.dataset.valor = s.valor;
+          select.add(o);
         });
-      });
+      }
+    });
     const statusList = [
       'Diagnosticando',
       'Aguardando Cliente',
@@ -420,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const ano = Number(yearFilter.value);
     const mes = Number(monthFilter.value);
     try {
-      const [metaObj] = await Promise.all([buscarMeta(ano, mes)]);
+      const metaObj = await buscarMeta(ano, mes);
       const servicosMap = new Map(
         (todosOsServicos || []).map((s) => [s.id, s])
       );
@@ -445,8 +441,10 @@ document.addEventListener('DOMContentLoaded', function () {
             os.tipo_recebimento === 'integral'
               ? parseFloat(os.valor_total) || 0
               : parseFloat(comissao) || 0;
-          lucrosPorServico[servicoNome] =
-            (lucrosPorServico[servicoNome] || 0) + lucro;
+          if (lucro > 0) {
+            lucrosPorServico[servicoNome] =
+              (lucrosPorServico[servicoNome] || 0) + lucro;
+          }
         });
       if (metaObj && metaObj.valor > 0) {
         metaDisplay.innerHTML = `Meta do Mês: <span class="font-semibold text-accent-amber">R$ ${parseFloat(
@@ -561,10 +559,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function handleAbrirModalMeta() {
     openModal('modalEditGoal');
-    fillMetaAnoSelect();
+    const anoAtual = new Date().getFullYear();
+    const selectAno = document.getElementById('inputMetaAno');
+    selectAno.innerHTML = '';
+    for (let i = anoAtual - 2; i <= anoAtual + 2; i++) {
+      selectAno.add(new Option(i, i));
+    }
+    selectAno.value = anoAtual;
     const mesAtual = new Date().getMonth() + 1;
     const selectMes = document.getElementById('inputMetaMes');
-    const selectAno = document.getElementById('inputMetaAno');
     if (selectMes) selectMes.value = mesAtual;
     const inputMetaMensal = document.getElementById('inputMetaMensal');
     const carregarMeta = async (ano, mes) => {
@@ -584,21 +587,6 @@ document.addEventListener('DOMContentLoaded', function () {
         carregarMeta(selectAno.value, selectMes.value)
       );
     }
-  }
-
-  function fillMetaAnoSelect() {
-    const selectAno = document.getElementById('inputMetaAno');
-    if (!selectAno) return;
-    selectAno.innerHTML = '';
-    const anoAtual = new Date().getFullYear();
-    for (let i = anoAtual - 2; i <= anoAtual + 2; i++) {
-      selectAno.add(new Option(i, i));
-    }
-    selectAno.value = anoAtual;
-  }
-  const btnEditGoal = document.getElementById('btnEditGoal');
-  if (btnEditGoal) {
-    btnEditGoal.addEventListener('click', handleAbrirModalMeta);
   }
 
   function handleSalvarMeta() {
@@ -625,51 +613,63 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-  const btnSalvarMeta = document.getElementById('btnSalvarMeta');
-  if (btnSalvarMeta) {
-    btnSalvarMeta.addEventListener('click', handleSalvarMeta);
+
+  function handleGenericFetch(url, options, successMessage, errorMessage) {
+    return fetch(url, options)
+      .then((response) => {
+        if (response.ok) {
+          return response.text();
+        }
+        throw new Error('Falha na resposta da rede.');
+      })
+      .then((text) => {
+        try {
+          const data = JSON.parse(text);
+          if (data.success === false)
+            throw new Error(data.error || errorMessage);
+        } catch (e) {}
+        showSnackbar(successMessage, 'success');
+        closeAllModals();
+        carregarDadosIniciais();
+      })
+      .catch((err) => {
+        showSnackbar(err.message || errorMessage, 'error');
+      });
   }
 
   function handleSalvarServico(e) {
-    const serviceNameEl = document.getElementById('serviceName');
-    const servicePriceEl = document.getElementById('servicePrice');
-    const serviceCommissionEl = document.getElementById('serviceCommission');
     e.preventDefault();
     clearFormErrors(false, 'serviceFormErrors');
     const errors = validateServiceForm();
-    if (errors.length) {
-      showServiceFormErrors(errors);
-      return;
-    }
+    if (errors.length) return showServiceFormErrors(errors);
     const formData = new FormData();
-    formData.append('nome', serviceNameEl.value.trim());
+    formData.append(
+      'nome',
+      document.getElementById('serviceName').value.trim()
+    );
     formData.append(
       'valor',
-      servicePriceEl.value.replace(/\./g, '').replace(',', '.')
+      document
+        .getElementById('servicePrice')
+        .value.replace(/\./g, '')
+        .replace(',', '.')
     );
     formData.append(
       'comissao',
-      serviceCommissionEl.value.replace(/\./g, '').replace(',', '.')
+      document
+        .getElementById('serviceCommission')
+        .value.replace(/\./g, '')
+        .replace(',', '.')
     );
-    fetch('servicos_insert.php', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          showSnackbar('Serviço adicionado com sucesso!', 'success');
-          closeAllModals();
-          [serviceNameEl, servicePriceEl, serviceCommissionEl].forEach(
-            (el) => (el.value = '')
-          );
-          carregarServicos();
-          fillSelectOptions();
-        } else {
-          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
-        }
-      })
-      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+    handleGenericFetch(
+      'servicos_insert.php',
+      {
+        method: 'POST',
+        body: formData,
+      },
+      'Serviço adicionado com sucesso!',
+      'Erro ao adicionar serviço.'
+    );
   }
 
   function handleSalvarEdicaoServico() {
@@ -683,58 +683,106 @@ document.addEventListener('DOMContentLoaded', function () {
       .value.replace(/\./g, '')
       .replace(',', '.');
     if (!nome || isNaN(parseFloat(valor)) || isNaN(parseFloat(comissao))) {
-      showSnackbar('Preencha todos os campos corretamente.', 'error');
-      return;
+      return showSnackbar('Preencha todos os campos corretamente.', 'error');
     }
-    fetch('servicos_update.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const payload = {
+      id: servicoEditandoId,
+      nome,
+      valor,
+      comissao,
+    };
+    handleGenericFetch(
+      'servicos_update.php',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify({
-        id: servicoEditandoId,
-        nome,
-        valor,
-        comissao,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          showSnackbar('Serviço atualizado!', 'success');
-          closeAllModals();
-          carregarServicos();
-          fillSelectOptions();
-        } else {
-          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
-        }
-      })
-      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+      'Serviço atualizado com sucesso!',
+      'Erro ao atualizar serviço.'
+    );
   }
 
   function handleConfirmarExcluirServico() {
     if (!servicoExcluindoId) return;
-    fetch('servicos_delete.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    handleGenericFetch(
+      'servicos_delete.php',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: servicoExcluindoId,
+        }),
       },
-      body: JSON.stringify({
-        id: servicoExcluindoId,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          showSnackbar('Serviço excluído!', 'success');
-          closeAllModals();
-          carregarServicos();
-          fillSelectOptions();
-        } else {
-          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
+      'Serviço excluído com sucesso!',
+      'Erro ao excluir serviço.'
+    );
+  }
+
+  function renderizarServicos(filtro = '') {
+    const servicesTableBody = document.getElementById('servicesTableBody');
+    if (!servicesTableBody) return;
+    const termoBusca = filtro.toLowerCase();
+    const servicosFiltrados = todosOsServicos.filter((servico) =>
+      servico.nome.toLowerCase().includes(termoBusca)
+    );
+    servicosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
+    servicesTableBody.innerHTML = '';
+    if (servicosFiltrados.length > 0) {
+      servicosFiltrados.forEach((servico) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+                    <td class="px-4 py-2 text-gray-200">${servico.nome}</td>
+                    <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                      servico.valor
+                    ).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })}</td>
+                    <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                      servico.comissao
+                    ).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button class="btn-editar-servico text-accent-blue hover:underline" data-id="${
+                          servico.id
+                        }">Editar</button>
+                    </td>`;
+        servicesTableBody.appendChild(tr);
+      });
+    } else {
+      servicesTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 py-4">${
+        filtro ? 'Nenhum serviço encontrado.' : 'Nenhum serviço cadastrado.'
+      }</td></tr>`;
+    }
+    document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
+      btn.addEventListener('click', function () {
+        servicoEditandoId = this.getAttribute('data-id');
+        const servico = todosOsServicos.find((s) => s.id == servicoEditandoId);
+        if (servico) {
+          document.getElementById('editServiceName').value = servico.nome;
+          document.getElementById('editServicePrice').value = parseFloat(
+            servico.valor
+          ).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+          });
+          document.getElementById('editServiceCommission').value = parseFloat(
+            servico.comissao
+          ).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+          });
+          openModal('modalEditService');
         }
-      })
-      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+      });
+    });
+  }
+
+  function carregarServicos() {
+    renderizarServicos();
   }
 
   function renderizarChamados(filtro = '') {
@@ -883,10 +931,7 @@ document.addEventListener('DOMContentLoaded', function () {
     e.preventDefault();
     clearFormErrors(true);
     const errors = validateOSForm(true);
-    if (errors.length) {
-      showFormErrors(errors, true);
-      return;
-    }
+    if (errors.length) return showFormErrors(errors, true);
     const payload = {
       id: osEditandoId,
       numero_os: document.getElementById('editOsInput').value.trim(),
@@ -908,24 +953,18 @@ document.addEventListener('DOMContentLoaded', function () {
         .replace(',', '.'),
       status: document.getElementById('selectStatusEditar').value,
     };
-    fetch('chamados_update.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    handleGenericFetch(
+      'chamados_update.php',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          showSnackbar('Ordem de Serviço atualizada!', 'success');
-          closeAllModals();
-          carregarDadosIniciais();
-        } else {
-          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
-        }
-      })
-      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+      'Ordem de Serviço atualizada!',
+      'Erro ao atualizar OS.'
+    );
   }
 
   function excluirChamado(id) {
@@ -935,36 +974,27 @@ document.addEventListener('DOMContentLoaded', function () {
       )
     )
       return;
-    fetch('chamados_delete.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    handleGenericFetch(
+      'chamados_delete.php',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+        }),
       },
-      body: JSON.stringify({
-        id,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          showSnackbar('Chamado excluído!', 'success');
-          closeAllModals();
-          carregarDadosIniciais();
-        } else {
-          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
-        }
-      })
-      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+      'Chamado excluído!',
+      'Erro ao excluir chamado.'
+    );
   }
 
   function handleSalvarOS(e) {
     e.preventDefault();
     clearFormErrors();
     const errors = validateOSForm();
-    if (errors.length) {
-      showFormErrors(errors);
-      return;
-    }
+    if (errors.length) return showFormErrors(errors);
     const payload = {
       numero_os: document.getElementById('osNumber').value.trim(),
       cliente: document.getElementById('clientName').value.trim(),
@@ -982,24 +1012,18 @@ document.addEventListener('DOMContentLoaded', function () {
         .replace(',', '.'),
       status: document.getElementById('selectStatus').value,
     };
-    fetch('chamados_insert.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    handleGenericFetch(
+      'chamados_insert.php',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          showSnackbar('Ordem de Serviço adicionada!', 'success');
-          closeAllModals();
-          carregarDadosIniciais();
-        } else {
-          showSnackbar(`Erro: ${data.error || 'Erro desconhecido.'}`, 'error');
-        }
-      })
-      .catch(() => showSnackbar('Erro de comunicação.', 'error'));
+      'Ordem de Serviço adicionada!',
+      'Erro ao adicionar OS.'
+    );
   }
 
   function showSnackbar(message, type = 'info') {
