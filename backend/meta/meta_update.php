@@ -1,6 +1,6 @@
 <?php
-// meta_update.php - Atualiza uma meta existente
-require 'config.php';
+
+require __DIR__ . '/../config.php';
 
 $id = $_POST['id'] ?? '';
 $valor = $_POST['valor'] ?? '';

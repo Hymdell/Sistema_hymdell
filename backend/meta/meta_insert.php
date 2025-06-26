@@ -1,6 +1,6 @@
 <?php
-// meta_insert.php - Adiciona uma nova meta
-require 'config.php';
+
+require __DIR__ . '/../config.php';
 
 $ano = $_POST['ano'] ?? '';
 $mes = $_POST['mes'] ?? '';

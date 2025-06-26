@@ -1,6 +1,6 @@
 <?php
-// chamados_delete.php - Remove um chamado (OS)
-require 'config.php';
+
+require __DIR__ . '/../config.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 $id = $data['id'] ?? null;

@@ -532,7 +532,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   async function buscarMeta(ano, mes) {
     try {
-      const res = await fetch(`meta_select.php?ano=${ano}&mes=${mes}`);
+      const res = await fetch(
+        `../backend/meta/meta_select.php?ano=${ano}&mes=${mes}`
+      );
       if (!res.ok) return null;
       const metas = await res.json();
       return Array.isArray(metas)
@@ -550,10 +552,10 @@ document.addEventListener('DOMContentLoaded', function () {
     return buscarMeta(ano, mes).then((meta) => {
       const formData = new FormData();
       formData.append('valor', valor);
-      let url = 'meta_insert.php';
+      let url = '../backend/meta/meta_insert.php';
       if (meta && meta.id) {
         formData.append('id', meta.id);
-        url = 'meta_update.php';
+        url = '../backend/meta/meta_update.php';
       } else {
         formData.append('ano', ano);
         formData.append('mes', mes);
@@ -670,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .replace(',', '.')
     );
     handleGenericFetch(
-      'servicos_insert.php',
+      '../backend/servicos/servicos_insert.php',
       {
         method: 'POST',
         body: formData,
@@ -700,7 +702,7 @@ document.addEventListener('DOMContentLoaded', function () {
       comissao,
     };
     handleGenericFetch(
-      'servicos_update.php',
+      '../backend/servicos/servicos_update.php',
       {
         method: 'POST',
         headers: {
@@ -716,7 +718,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function handleConfirmarExcluirServico() {
     if (!servicoExcluindoId) return;
     handleGenericFetch(
-      'servicos_delete.php',
+      '../backend/servicos/servicos_delete.php',
       {
         method: 'POST',
         headers: {
@@ -889,8 +891,12 @@ document.addEventListener('DOMContentLoaded', function () {
   async function carregarDadosIniciais() {
     try {
       const [chamadosData, servicosData] = await Promise.all([
-        fetch('chamados_select.php').then((res) => res.json()),
-        fetch('servicos_select.php').then((res) => res.json()),
+        fetch('../backend/chamados/chamados_select.php').then((res) =>
+          res.json()
+        ),
+        fetch('../backend/servicos/servicos_select.php').then((res) =>
+          res.json()
+        ),
       ]);
       todasAsOrdens = Array.isArray(chamadosData) ? chamadosData : [];
       todosOsServicos = Array.isArray(servicosData) ? servicosData : [];
@@ -962,7 +968,7 @@ document.addEventListener('DOMContentLoaded', function () {
       status: document.getElementById('selectStatusEditar').value,
     };
     handleGenericFetch(
-      'chamados_update.php',
+      '../backend/chamados/chamados_update.php',
       {
         method: 'POST',
         headers: {
@@ -983,7 +989,7 @@ document.addEventListener('DOMContentLoaded', function () {
     )
       return;
     handleGenericFetch(
-      'chamados_delete.php',
+      '../backend/chamados/chamados_delete.php',
       {
         method: 'POST',
         headers: {
@@ -1021,7 +1027,7 @@ document.addEventListener('DOMContentLoaded', function () {
       status: document.getElementById('selectStatus').value,
     };
     handleGenericFetch(
-      'chamados_insert.php',
+      '../backend/chamados/chamados_insert.php',
       {
         method: 'POST',
         headers: {

@@ -1,6 +1,6 @@
 <?php
-// servicos_select.php - Lista todos os serviços
-require 'config.php';
+
+require __DIR__ . '/../config.php';
 
 $stmt = $pdo->query('SELECT * FROM Servicos ORDER BY nome');
 $servicos = $stmt->fetchAll(PDO::FETCH_ASSOC);

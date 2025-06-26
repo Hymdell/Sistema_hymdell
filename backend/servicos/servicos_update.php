@@ -1,8 +1,8 @@
 <?php
-// servicos_update.php - Atualiza um serviço existente
-require 'config.php';
 
-// Permitir tanto POST tradicional quanto JSON
+require __DIR__ . '/../config.php';
+
+
 if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
     $data = json_decode(file_get_contents('php://input'), true);
     $id = $data['id'] ?? '';

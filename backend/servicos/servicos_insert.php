@@ -1,6 +1,6 @@
 <?php
-// servicos_insert.php - Adiciona um novo serviço
-require 'config.php';
+
+require __DIR__ . '/../config.php';
 
 $nome = $_POST['nome'] ?? '';
 $valor = $_POST['valor'] ?? '';
