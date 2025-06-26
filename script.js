@@ -1,6 +1,3 @@
-// Manipulação das modais
-// Agora todo o código só executa após o DOM estar pronto
-
 document.addEventListener('DOMContentLoaded', function () {
   const modals = {
     modalAddOS: document.getElementById('modalAddOS'),
@@ -12,8 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
     modalDeleteService: document.getElementById('modalDeleteService'),
     modalEditGoal: document.getElementById('modalEditGoal'),
   };
-
-  // Botões para abrir modais
   document
     .getElementById('btnAddOS')
     .addEventListener('click', () => openModal('modalAddOS'));
@@ -27,8 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
     openModal('modalManageServices');
     carregarServicos();
   });
-
-  // Botões de edição de OS
   document.querySelectorAll('.edit-os-btn').forEach((button) => {
     button.addEventListener('click', function () {
       const osNumber = this.getAttribute('data-os');
@@ -36,8 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
       openModal('modalEditOS');
     });
   });
-
-  // Botões mobile
   document
     .getElementById('btnMobileActions')
     .addEventListener('click', toggleMobileMenu);
@@ -57,25 +48,19 @@ document.addEventListener('DOMContentLoaded', function () {
       openModal('modalCharts');
       closeMobileMenu();
     });
-
-  // Botões para fechar modais
   document.querySelectorAll('.closeModal').forEach((button) => {
     button.addEventListener('click', closeAllModals);
   });
-
-  // Fechar modais ao clicar fora
   Object.values(modals).forEach((modal) => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeAllModals();
     });
   });
 
-  // Funções de manipulação de modais
   function openModal(modalId) {
     closeAllModals();
     modals[modalId].classList.remove('hidden');
     document.body.style.overflow = 'hidden';
-
     if (modalId === 'modalCharts') {
       animateChartBars();
     }
@@ -97,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('mobileActionsMenu').classList.add('hidden');
   }
 
-  // Animação das barras do gráfico quando o modal é aberto
   function animateChartBars() {
     setTimeout(() => {
       const bars = document.querySelectorAll('.chart-bar');
@@ -111,8 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }, 300);
   }
-
-  // Alternar ano do gráfico
   document.getElementById('filtroAno').addEventListener('change', function () {
     const bars = document.querySelectorAll('.chart-bar');
     const randomHeights = [
@@ -123,28 +105,22 @@ document.addEventListener('DOMContentLoaded', function () {
       Math.floor(Math.random() * 60) + 20 + '%',
       Math.floor(Math.random() * 60) + 20 + '%',
     ];
-
     bars.forEach((bar, index) => {
       bar.style.setProperty('--target-height', randomHeights[index]);
       bar.style.height = '0%';
     });
-
     setTimeout(() => {
       bars.forEach((bar, index) => {
         bar.style.height = randomHeights[index];
       });
     }, 100);
   });
-
-  // Atualizar valor com base no serviço selecionado
   document
     .getElementById('selectServico')
     .addEventListener('change', function () {
       const valorInput = document.getElementById('valorTotal');
       const valorSelecionado = this.value;
-
       if (valorSelecionado) {
-        // Formatar o valor para o formato brasileiro (R$ 000,00)
         const valorFormatado = parseFloat(valorSelecionado)
           .toFixed(2)
           .replace('.', ',');
@@ -153,16 +129,12 @@ document.addEventListener('DOMContentLoaded', function () {
         valorInput.value = '';
       }
     });
-
-  // Atualizar valor com base no serviço selecionado (modal de edição)
   document
     .getElementById('selectServicoEditar')
     .addEventListener('change', function () {
       const valorInput = document.getElementById('valorTotalEditar');
       const valorSelecionado = this.value;
-
       if (valorSelecionado) {
-        // Formatar o valor para o formato brasileiro (R$ 000,00)
         const valorFormatado = parseFloat(valorSelecionado)
           .toFixed(2)
           .replace('.', ',');
@@ -172,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-  // Atualizar valor total SEMPRE com valor integral do serviço (criação)
   function atualizarValorTotalOS() {
     const selectServico = document.getElementById('selectServico');
     const valorInput = document.getElementById('valorTotal');
@@ -186,9 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document
     .getElementById('selectServico')
     .addEventListener('change', atualizarValorTotalOS);
-  // O tipo de recebimento não altera o valor exibido
 
-  // Atualizar valor total SEMPRE com valor integral do serviço (edição)
   function atualizarValorTotalEditOS() {
     const selectServicoEditar = document.getElementById('selectServicoEditar');
     const valorInput = document.getElementById('valorTotalEditar');
@@ -202,9 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document
     .getElementById('selectServicoEditar')
     .addEventListener('change', atualizarValorTotalEditOS);
-  // O tipo de recebimento não altera o valor exibido
 
-  // Função para aplicar máscara de telefone
   function maskPhone(input) {
     input.addEventListener('input', function () {
       let v = input.value.replace(/\D/g, '');
@@ -221,7 +188,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Validação dos campos obrigatórios e tipos
   function validateOSForm(isEdit = false) {
     const prefix = isEdit ? 'edit' : '';
     const errors = [];
@@ -238,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const defectSolution = getValue('defectSolution');
     const osNumber = getValue('osNumber');
     const phone = getValue('phone');
-
     if (osNumber && !/^[\d]+$/.test(osNumber)) {
       errors.push('Número da OS deve conter apenas números.');
     }
@@ -263,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return errors;
   }
 
-  // Exibir erros na tela
   function showFormErrors(errors, isEdit = false) {
     let errorDiv = document.getElementById(
       isEdit ? 'editOsFormErrors' : 'osFormErrors'
@@ -279,18 +243,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
   }
+
   function clearFormErrors(isEdit = false) {
     const errorDiv = document.getElementById(
       isEdit ? 'editOsFormErrors' : 'osFormErrors'
     );
     if (errorDiv) errorDiv.innerHTML = '';
   }
-
-  // Máscara de telefone
   maskPhone(document.getElementById('phone'));
   maskPhone(document.getElementById('editPhone'));
 
-  // --- Adicionar Serviço: Validação e Comissão ---
   function maskMoney(input) {
     input.addEventListener('input', function () {
       let v = input.value.replace(/\D/g, '');
@@ -304,7 +266,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const servicePrice = document.getElementById('servicePrice');
   const serviceCommission = document.getElementById('serviceCommission');
   const btnUpdateCommission = document.getElementById('btnUpdateCommission');
-
   if (servicePrice) {
     maskMoney(servicePrice);
   }
@@ -320,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-  // Validação do modal de serviço
+
   function validateServiceForm() {
     const errors = [];
     const nome = serviceName ? serviceName.value.trim() : '';
@@ -332,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
       );
     return errors;
   }
+
   function showServiceFormErrors(errors) {
     let errorDiv = document.getElementById('serviceFormErrors');
     if (!errorDiv) {
@@ -343,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     errorDiv.innerHTML = errors.map((e) => `<div>• ${e}</div>`).join('');
   }
+
   function clearServiceFormErrors() {
     const errorDiv = document.getElementById('serviceFormErrors');
     if (errorDiv) errorDiv.innerHTML = '';
@@ -357,15 +320,12 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         return;
       }
-      // Aqui segue o fluxo normal de adição de serviço
     });
 
-  // --- Preencher selects de serviço com ID como value ---
   function fillSelectOptions() {
     fetch('servicos_select.php')
       .then((res) => res.json())
       .then((servicos) => {
-        // Preencher selectServico (adicionar OS)
         const selectServico = document.getElementById('selectServico');
         if (selectServico) {
           selectServico.innerHTML = '';
@@ -381,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function () {
             selectServico.appendChild(o);
           });
         }
-        // Preencher selectServicoEditar (editar OS)
         const selectServicoEditar = document.getElementById(
           'selectServicoEditar'
         );
@@ -400,7 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         }
       });
-    // Preencher status
     const statusList = [
       'Diagnosticando',
       'Aguardando Cliente',
@@ -430,8 +388,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   fillSelectOptions();
-
-  // Atualizar valor total ao selecionar serviço (usando data-valor)
   document
     .getElementById('selectServico')
     .addEventListener('change', function () {
@@ -456,9 +412,6 @@ document.addEventListener('DOMContentLoaded', function () {
         valorInput.value = '';
       }
     });
-
-  // --- GRÁFICO DE LUCROS ---
-  // Exemplo de dados dinâmicos (pode ser substituído depois)
   const chartData = {
     anos: [2025],
     meses: [
@@ -478,10 +431,9 @@ document.addEventListener('DOMContentLoaded', function () {
     valoresPorAno: {
       2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
-    meta: 0, // valor de meta para linha de referência (zerado)
+    meta: 0,
   };
 
-  // Gráfico: atualizar para filtroAno
   function fillYearFilter() {
     const filtroAno = document.getElementById('filtroAno');
     filtroAno.innerHTML = '';
@@ -516,12 +468,14 @@ document.addEventListener('DOMContentLoaded', function () {
   function fillChartYAxis(maxValue) {
     const yAxis = document.getElementById('chartYAxis');
     yAxis.innerHTML = '';
-    // Exemplo: 5 divisões
     for (let i = 5; i >= 0; i--) {
       const valor = Math.round((maxValue * i) / 5);
       const span = document.createElement('span');
       span.textContent =
-        'R$ ' + valor.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+        'R$ ' +
+        valor.toLocaleString('pt-BR', {
+          minimumFractionDigits: 0,
+        });
       yAxis.appendChild(span);
     }
   }
@@ -548,7 +502,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fillChartBars(ano) {
     const barsContainer = document.getElementById('chartBarsContainer');
-    // Remove barras antigas (exceto linhas de referência e meta)
     barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
     const valores = chartData.valoresPorAno[ano] || [];
     const max = Math.max(...valores, chartData.meta || 0);
@@ -558,13 +511,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const barInner = document.createElement('div');
       barInner.className =
         'w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
-      const altura = max > 0 ? (valor / max) * 80 + 10 : 0; // altura relativa (10% a 90%)
+      const altura = max > 0 ? (valor / max) * 80 + 10 : 0;
       barInner.style.setProperty('--target-height', altura + '%');
       barInner.style.height = '0%';
       bar.appendChild(barInner);
       barsContainer.appendChild(bar);
     });
-    // Atualiza linha de meta
     const goalLine = document.getElementById('chartGoalLine');
     if (goalLine) {
       const meta = chartData.meta || 0;
@@ -585,18 +537,18 @@ document.addEventListener('DOMContentLoaded', function () {
     fillChartXAxis();
     fillChartReferenceLines();
     fillChartBars(ano);
-    // Preencher total do período
     const total = valores.reduce((acc, v) => acc + v, 0);
     const totalSpan = document.getElementById('chartTotalPeriodo');
     if (totalSpan) {
       totalSpan.textContent =
         total === 0
           ? '-'
-          : 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+          : 'R$ ' +
+            total.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            });
     }
   }
-
-  // Inicialização do gráfico
   if (document.getElementById('filtroAno')) {
     fillYearFilter();
     updateChart(chartData.anos[0]);
@@ -606,8 +558,6 @@ document.addEventListener('DOMContentLoaded', function () {
         updateChart(this.value);
       });
   }
-
-  // --- Exclusão de Chamado (OS) ---
   const btnDeletarChamado = document.getElementById('btnDeletarChamado');
   if (btnDeletarChamado) {
     btnDeletarChamado.addEventListener('click', function () {
@@ -617,7 +567,6 @@ document.addEventListener('DOMContentLoaded', function () {
         )
       )
         return;
-      // Recupera o ID do chamado a partir do modal (exemplo: pode ser salvo em um atributo data-id)
       const osId = btnDeletarChamado.getAttribute('data-id');
       if (!osId) {
         showSnackbar('ID do chamado não encontrado.', 'error');
@@ -625,8 +574,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       fetch('chamados_delete.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: osId }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: osId,
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -647,8 +600,6 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     });
   }
-
-  // --- GERENCIAMENTO DE SERVIÇOS (LISTAR, EDITAR, EXCLUIR) ---
   const btnManageServices = document.getElementById('btnManageServices');
   const modalManageServices = document.getElementById('modalManageServices');
   const servicesTableBody = document.getElementById('servicesTableBody');
@@ -656,8 +607,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const modalDeleteService = document.getElementById('modalDeleteService');
   let servicoEditandoId = null;
   let servicoExcluindoId = null;
-
-  // Abrir modal de gerenciamento e listar serviços
   if (btnManageServices) {
     btnManageServices.addEventListener('click', function () {
       openModal('modalManageServices');
@@ -665,7 +614,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Função para carregar serviços via AJAX
   function carregarServicos() {
     fetch('servicos_select.php')
       .then((res) => res.json())
@@ -699,7 +647,6 @@ document.addEventListener('DOMContentLoaded', function () {
           servicesTableBody.innerHTML =
             '<tr><td colspan="4" class="text-center text-gray-400 py-4">Nenhum serviço cadastrado.</td></tr>';
         }
-        // Adiciona eventos aos botões de ação
         document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
           btn.addEventListener('click', function () {
             servicoEditandoId = this.getAttribute('data-id');
@@ -707,10 +654,14 @@ document.addEventListener('DOMContentLoaded', function () {
               this.getAttribute('data-nome');
             document.getElementById('editServicePrice').value = parseFloat(
               this.getAttribute('data-valor')
-            ).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            ).toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            });
             document.getElementById('editServiceCommission').value = parseFloat(
               this.getAttribute('data-comissao')
-            ).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            ).toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            });
             openModal('modalEditService');
           });
         });
@@ -726,8 +677,6 @@ document.addEventListener('DOMContentLoaded', function () {
           '<tr><td colspan="4" class="text-center text-red-400 py-4">Erro ao carregar serviços.</td></tr>';
       });
   }
-
-  // Salvar edição de serviço
   const btnSalvarEdicaoServico = document.getElementById(
     'btnSalvarEdicaoServico'
   );
@@ -748,8 +697,15 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       fetch('servicos_update.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: servicoEditandoId, nome, valor, comissao }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: servicoEditandoId,
+          nome,
+          valor,
+          comissao,
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -770,8 +726,6 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     });
   }
-
-  // Confirmar exclusão de serviço
   const btnConfirmarExcluirServico = document.getElementById(
     'btnConfirmarExcluirServico'
   );
@@ -780,8 +734,12 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!servicoExcluindoId) return;
       fetch('servicos_delete.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: servicoExcluindoId }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: servicoExcluindoId,
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -802,8 +760,6 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     });
   }
-
-  // Máscara para edição de preço/comissão
   const editServicePrice = document.getElementById('editServicePrice');
   const editServiceCommission = document.getElementById(
     'editServiceCommission'
@@ -826,17 +782,13 @@ document.addEventListener('DOMContentLoaded', function () {
       this.value = v;
     });
   }
-
-  // Botão Editar Meta
   const btnEditGoal = document.getElementById('btnEditGoal');
   if (btnEditGoal) {
     btnEditGoal.addEventListener('click', () => {
       openModal('modalEditGoal');
-      // Aqui pode-se carregar a meta atual via AJAX futuramente
     });
   }
 
-  // --- CAMPOS DE ANO E MÊS NO MODAL DE META ---
   function fillMetaAno() {
     const selectAno = document.getElementById('inputMetaAno');
     if (!selectAno) return;
@@ -851,8 +803,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   if (document.getElementById('inputMetaAno')) fillMetaAno();
-
-  // Ao abrir o modal de meta, setar ano/mês atuais como padrão
   if (btnEditGoal) {
     btnEditGoal.addEventListener('click', () => {
       openModal('modalEditGoal');
@@ -860,18 +810,14 @@ document.addEventListener('DOMContentLoaded', function () {
       const mesAtual = new Date().getMonth() + 1;
       const selectMes = document.getElementById('inputMetaMes');
       if (selectMes) selectMes.value = mesAtual;
-      // Aqui pode-se carregar a meta atual via AJAX futuramente
     });
   }
-
-  // Clique em salvar meta (agora captura ano, mês e mensal)
   const btnSalvarMeta = document.getElementById('btnSalvarMeta');
   if (btnSalvarMeta) {
     btnSalvarMeta.addEventListener('click', function () {
       const ano = document.getElementById('inputMetaAno').value;
       const mes = document.getElementById('inputMetaMes').value;
       const mensal = document.getElementById('inputMetaMensal').value;
-      // Aqui você pode integrar com meta_update.php via AJAX, enviando ano, mes, mensal
       showSnackbar(
         `Meta salva! Ano: ${ano}, Mês: ${mes}, Mensal: ${mensal}`,
         'success'
@@ -880,17 +826,23 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // --- SUPORTE AO FILTRO DE MÊS NO GRÁFICO ---
   function getDiasNoMes(ano, mes) {
     return new Date(ano, mes, 0).getDate();
   }
-
-  // Exemplo de dados diários (substitua por dados reais do backend futuramente)
   const chartDataDiario = {
-    // chartDataDiario[ano][mes] = [valorDia1, valorDia2, ...]
     2025: {
-      6: Array.from({ length: 30 }, (_, i) => Math.floor(Math.random() * 500)), // Junho 2025
-      7: Array.from({ length: 31 }, (_, i) => Math.floor(Math.random() * 500)), // Julho 2025
+      6: Array.from(
+        {
+          length: 30,
+        },
+        (_, i) => Math.floor(Math.random() * 500)
+      ),
+      7: Array.from(
+        {
+          length: 31,
+        },
+        (_, i) => Math.floor(Math.random() * 500)
+      ),
     },
   };
 
@@ -922,7 +874,6 @@ document.addEventListener('DOMContentLoaded', function () {
       bar.appendChild(barInner);
       barsContainer.appendChild(bar);
     });
-    // Atualiza linha de meta (opcional)
     const goalLine = document.getElementById('chartGoalLine');
     if (goalLine) {
       const meta = chartData.meta || 0;
@@ -943,18 +894,18 @@ document.addEventListener('DOMContentLoaded', function () {
     fillChartXAxisDias(ano, mes);
     fillChartReferenceLines();
     fillChartBarsDias(ano, mes);
-    // Preencher total do período
     const total = valores.reduce((acc, v) => acc + v, 0);
     const totalSpan = document.getElementById('chartTotalPeriodo');
     if (totalSpan) {
       totalSpan.textContent =
         total === 0
           ? '-'
-          : 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+          : 'R$ ' +
+            total.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            });
     }
   }
-
-  // Inicialização do gráfico diário
   if (
     document.getElementById('filtroAno') &&
     document.getElementById('filtroMes')
@@ -968,12 +919,9 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroMes.addEventListener('change', function () {
       updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
     });
-    // Exibe gráfico diário ao abrir
     updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
   }
-
-  // --- TOGGLE ENTRE VISUALIZAÇÃO ANUAL E MENSAL ---
-  let visaoGrafico = 'anual'; // 'anual' ou 'mensal'
+  let visaoGrafico = 'anual';
   const toggleVisaoGrafico = document.getElementById('toggleVisaoGrafico');
   if (
     toggleVisaoGrafico &&
@@ -982,6 +930,7 @@ document.addEventListener('DOMContentLoaded', function () {
   ) {
     const filtroAno = document.getElementById('filtroAno');
     const filtroMes = document.getElementById('filtroMes');
+
     function atualizarVisaoGrafico() {
       if (visaoGrafico === 'anual') {
         toggleVisaoGrafico.textContent = 'Anual';
@@ -1001,12 +950,10 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroMes.addEventListener('change', function () {
       if (visaoGrafico === 'mensal') atualizarVisaoGrafico();
     });
-    // Inicialização: começa em anual
     filtroMes.disabled = true;
     atualizarVisaoGrafico();
   }
 
-  // --- CRUD DE METAS (AJAX) ---
   function buscarMeta(ano, mes) {
     return fetch('meta_select.php')
       .then((res) => res.json())
@@ -1019,10 +966,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function inserirOuAtualizarMeta(ano, mes, valor) {
-    // Tenta buscar meta existente
     return buscarMeta(ano, mes).then((meta) => {
       if (meta) {
-        // Atualizar
         const formData = new FormData();
         formData.append('id', meta.id);
         formData.append('valor', valor);
@@ -1031,7 +976,6 @@ document.addEventListener('DOMContentLoaded', function () {
           body: formData,
         }).then((res) => res.json());
       } else {
-        // Inserir
         const formData = new FormData();
         formData.append('ano', ano);
         formData.append('mes', mes);
@@ -1052,8 +996,6 @@ document.addEventListener('DOMContentLoaded', function () {
       body: formData,
     }).then((res) => res.json());
   }
-
-  // --- Integração com o modal de meta ---
   if (btnEditGoal) {
     btnEditGoal.addEventListener('click', () => {
       openModal('modalEditGoal');
@@ -1062,7 +1004,6 @@ document.addEventListener('DOMContentLoaded', function () {
       const selectMes = document.getElementById('inputMetaMes');
       const selectAno = document.getElementById('inputMetaAno');
       if (selectMes) selectMes.value = mesAtual;
-      // Buscar meta existente e preencher campo
       buscarMeta(selectAno.value, selectMes.value).then((meta) => {
         document.getElementById('inputMetaMensal').value = meta
           ? Number(meta.valor).toLocaleString('pt-BR', {
@@ -1073,7 +1014,6 @@ document.addEventListener('DOMContentLoaded', function () {
           .getElementById('inputMetaMensal')
           .setAttribute('data-meta-id', meta ? meta.id : '');
       });
-      // Atualizar campo ao trocar ano/mês
       selectAno.addEventListener('change', function () {
         buscarMeta(this.value, selectMes.value).then((meta) => {
           document.getElementById('inputMetaMensal').value = meta
@@ -1100,7 +1040,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-
   if (btnSalvarMeta) {
     btnSalvarMeta.addEventListener('click', function () {
       const ano = document.getElementById('inputMetaAno').value;
@@ -1124,8 +1063,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-
-  // --- INSERÇÃO DE SERVIÇO VIA AJAX ---
   const btnSalvarServico = document.querySelector(
     '#modalAddService .bg-accent-amber'
   );
@@ -1156,11 +1093,9 @@ document.addEventListener('DOMContentLoaded', function () {
           if (data.success) {
             showSnackbar('Serviço adicionado com sucesso!', 'success');
             closeAllModals();
-            // Limpar formulário
             serviceName.value = '';
             servicePrice.value = '';
             serviceCommission.value = '';
-            // Atualizar selects e tabela de serviços
             carregarServicos();
             fillSelectOptions();
           } else {
@@ -1177,7 +1112,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // --- LISTAGEM DINÂMICA DE CHAMADOS/OS ---
   function carregarChamados() {
     fetch('chamados_select.php')
       .then((res) => res.json())
@@ -1186,7 +1120,6 @@ document.addEventListener('DOMContentLoaded', function () {
         osTableBody.innerHTML = '';
         if (data && Array.isArray(data) && data.length > 0) {
           data.forEach((os) => {
-            // Formatação de datas
             function formatarDataHora(dataStr) {
               if (!dataStr) return '-';
               const partes = dataStr.split(' ');
@@ -1199,37 +1132,23 @@ document.addEventListener('DOMContentLoaded', function () {
               }
               return '-';
             }
-            // Status colorido
+
             function getStatusBadge(status) {
-              let cor = '#64748b';
-              let bg = '#e5e7eb';
-              let texto = status;
               if (!status) return '';
-              switch (status) {
-                case 'Diagnosticando':
-                  cor = '#2563eb';
-                  bg = '#dbeafe';
-                  break;
-                case 'Aguardando Cliente':
-                  cor = '#f59e42';
-                  bg = '#fef3c7';
-                  break;
-                case 'Aguardando Peça':
-                  cor = '#a21caf';
-                  bg = '#f3e8ff';
-                  break;
-                case 'Aguardando Retirada':
-                  cor = '#64748b';
-                  bg = '#e5e7eb';
-                  break;
-                case 'Concluído':
-                  cor = '#22c55e';
-                  bg = '#dcfce7';
-                  break;
-              }
-              return `<span style="display:inline-block;padding:2px 16px;border-radius:999px;font-weight:600;font-size:0.95em;background:${bg};color:${cor};min-width:120px;text-align:center;">${texto}</span>`;
+              const statusStyles = {
+                Diagnosticando: 'bg-status-blue-bg text-status-blue-text',
+                'Aguardando Cliente':
+                  'bg-status-amber bg-opacity-20 text-status-amber',
+                'Aguardando Peça':
+                  'bg-status-fuchsia-bg text-status-fuchsia-text',
+                'Aguardando Retirada':
+                  'bg-status-slate-bg text-status-slate-text',
+                Concluído: 'bg-status-green bg-opacity-20 text-status-green',
+              };
+              const styleClass =
+                statusStyles[status] || 'bg-gray-200 text-gray-800';
+              return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${styleClass}">${status}</span>`;
             }
-            // Valor
             let valor = '-';
             let valorNum =
               os.valor_total !== undefined && os.valor_total !== null
@@ -1246,40 +1165,40 @@ document.addEventListener('DOMContentLoaded', function () {
                   minimumFractionDigits: 2,
                 });
             }
-            // Montar linha
             const tr = document.createElement('tr');
+            tr.className =
+              'os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30';
             tr.innerHTML = `
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
-                os.id
-              }</td>
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
                 os.numero_os || '-'
               }</td>
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
                 os.cliente
               }</td>
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
                 os.item
               }</td>
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${formatarDataHora(
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${formatarDataHora(
                 os.data_entrada
               )}</td>
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${formatarDataHora(
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${formatarDataHora(
                 os.data_atualizacao
               )}</td>
-              <td class="px-6 py-3">${getStatusBadge(os.status)}</td>
-              <td class="px-6 py-3 text-gray-200 whitespace-nowrap">${valor}</td>
-              <td class="px-6 py-3 text-center">
-                <button class="btn-editar-os text-accent-blue hover:underline mr-2" data-id="${
-                  os.id
-                }">Editar</button>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${getStatusBadge(
+                os.status
+              )}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${valor}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                  <button class="btn-editar-os text-accent-blue hover:underline" data-id="${
+                    os.id
+                  }">Editar</button>
               </td>
             `;
             osTableBody.appendChild(tr);
           });
         } else {
           osTableBody.innerHTML =
-            '<tr><td colspan="9" class="text-center text-gray-400 py-4">Nenhuma OS cadastrada.</td></tr>';
+            '<tr><td colspan="8" class="text-center text-gray-400 py-4">Nenhuma OS cadastrada.</td></tr>';
         }
         document.querySelectorAll('.btn-editar-os').forEach((btn) => {
           btn.addEventListener('click', function () {
@@ -1290,24 +1209,18 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(() => {
         const osTableBody = document.getElementById('osTableBody');
         osTableBody.innerHTML =
-          '<tr><td colspan="9" class="text-center text-red-400 py-4">Erro ao carregar OS.</td></tr>';
+          '<tr><td colspan="8" class="text-center text-red-400 py-4">Erro ao carregar OS.</td></tr>';
       });
   }
 
-  // Função utilitária para formatar datas (YYYY-MM-DD para DD/MM/YYYY)
   function formatarData(dataStr) {
     if (!dataStr) return '';
     const [ano, mes, dia] = dataStr.split('-');
     return `${dia}/${mes}/${ano}`;
   }
-
-  // Chamar ao carregar a página
   carregarChamados();
-
-  // --- EDIÇÃO E EXCLUSÃO DE OS VIA AJAX ---
   let osEditandoId = null;
 
-  // Abrir modal de edição e preencher campos
   function abrirModalEditarOS(id) {
     fetch('chamados_select.php')
       .then((res) => res.json())
@@ -1326,7 +1239,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editExitDate').value = os.data_saida || '';
         document.getElementById('editDefectSolution').value =
           os.defeito_solucao || '';
-        // Preencher selects de serviço
         fetch('servicos_select.php')
           .then((res) => res.json())
           .then((servicos) => {
@@ -1346,7 +1258,6 @@ document.addEventListener('DOMContentLoaded', function () {
               selectServicoEditar.appendChild(o);
             });
           });
-        // Status corretos
         const statusList = [
           'Diagnosticando',
           'Aguardando Cliente',
@@ -1364,7 +1275,6 @@ document.addEventListener('DOMContentLoaded', function () {
           if (s === os.status) o.selected = true;
           selectStatusEditar.appendChild(o);
         });
-        // Valor total
         document.getElementById('valorTotalEditar').value =
           os.valor_total !== undefined &&
           os.valor_total !== null &&
@@ -1373,18 +1283,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 minimumFractionDigits: 2,
               })
             : '';
-        // Tipo recebimento
         document.getElementById('selectRecebimentoEditar').value =
           os.tipo_recebimento || 'comissao';
         openModal('modalEditOS');
-        // Salvar ID para exclusão
         document
           .getElementById('btnDeletarChamado')
           .setAttribute('data-id', os.id);
       });
   }
-
-  // Salvar edição de OS
   const btnSalvarEdicaoOS = document.querySelector(
     '#modalEditOS .bg-accent-blue'
   );
@@ -1397,7 +1303,6 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         return;
       }
-      // Coletar dados do formulário de edição
       const numero_os = document
         .getElementById('editOsNumber')
         .textContent.replace('#', '')
@@ -1437,7 +1342,9 @@ document.addEventListener('DOMContentLoaded', function () {
       };
       fetch('chamados_update.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload),
       })
         .then((res) => res.json())
@@ -1459,7 +1366,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Excluir OS
   function excluirChamado(id) {
     if (
       !confirm(
@@ -1469,8 +1375,12 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     fetch('chamados_delete.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -1489,8 +1399,6 @@ document.addEventListener('DOMContentLoaded', function () {
         showSnackbar('Erro de comunicação com o servidor.', 'error')
       );
   }
-
-  // --- ADIÇÃO DE OS (CHAMADO) ---
   const btnSalvarOS = document.querySelector('#modalAddOS .bg-accent-blue');
   if (btnSalvarOS) {
     btnSalvarOS.addEventListener('click', function (e) {
@@ -1501,7 +1409,6 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         return;
       }
-      // Coletar dados do formulário de adição
       const numero_os = document.getElementById('osNumber').value.trim();
       const cliente = document.getElementById('clientName').value.trim();
       const atendente = document.getElementById('attendant').value.trim();
@@ -1536,7 +1443,9 @@ document.addEventListener('DOMContentLoaded', function () {
       };
       fetch('chamados_insert.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload),
       })
         .then((res) => res.json())
@@ -1558,7 +1467,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // --- SNACKBAR VISUAL ---
   function showSnackbar(message, type = 'info') {
     let snackbar = document.getElementById('snackbarCustom');
     if (!snackbar) {
@@ -1581,15 +1489,14 @@ document.addEventListener('DOMContentLoaded', function () {
       snackbar.style.pointerEvents = 'none';
       document.body.appendChild(snackbar);
     }
-    // Cores por tipo
     let bg = '#2196f3',
       color = '#fff';
     if (type === 'success') {
-      bg = '#22c55e'; // verde
+      bg = '#22c55e';
     } else if (type === 'error') {
-      bg = '#ef4444'; // vermelho
+      bg = '#ef4444';
     } else if (type === 'warning') {
-      bg = '#f59e42'; // laranja
+      bg = '#f59e42';
     }
     snackbar.style.background = bg;
     snackbar.style.color = color;
