@@ -527,14 +527,9 @@ document.addEventListener('DOMContentLoaded', function () {
                       minimumFractionDigits: 2,
                     })}</td>
                     <td class="px-4 py-2 text-center">
-                        <button class="btn-editar-servico text-accent-blue hover:underline mr-2" data-id="${
+                        <button class="btn-editar-servico text-accent-blue hover:underline" data-id="${
                           servico.id
-                        }" data-nome="${servico.nome}" data-valor="${
-          servico.valor
-        }" data-comissao="${servico.comissao}">Editar</button>
-                        <button class="btn-excluir-servico text-status-red hover:underline" data-id="${
-                          servico.id
-                        }">Excluir</button>
+                        }">Editar</button>
                     </td>`;
         servicesTableBody.appendChild(tr);
       });
@@ -546,25 +541,21 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
       btn.addEventListener('click', function () {
         servicoEditandoId = this.getAttribute('data-id');
-        document.getElementById('editServiceName').value =
-          this.getAttribute('data-nome');
-        document.getElementById('editServicePrice').value = parseFloat(
-          this.getAttribute('data-valor')
-        ).toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-        });
-        document.getElementById('editServiceCommission').value = parseFloat(
-          this.getAttribute('data-comissao')
-        ).toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-        });
-        openModal('modalEditService');
-      });
-    });
-    document.querySelectorAll('.btn-excluir-servico').forEach((btn) => {
-      btn.addEventListener('click', function () {
-        servicoExcluindoId = this.getAttribute('data-id');
-        openModal('modalDeleteService');
+        const servico = todosOsServicos.find((s) => s.id == servicoEditandoId);
+        if (servico) {
+          document.getElementById('editServiceName').value = servico.nome;
+          document.getElementById('editServicePrice').value = parseFloat(
+            servico.valor
+          ).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+          });
+          document.getElementById('editServiceCommission').value = parseFloat(
+            servico.comissao
+          ).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+          });
+          openModal('modalEditService');
+        }
       });
     });
   }
@@ -638,6 +629,16 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(() =>
           showSnackbar('Erro de comunicação com o servidor.', 'error')
         );
+    });
+  }
+  const btnExcluirServicoDoModal = document.getElementById(
+    'btnExcluirServicoDoModal'
+  );
+  if (btnExcluirServicoDoModal) {
+    btnExcluirServicoDoModal.addEventListener('click', function () {
+      servicoExcluindoId = servicoEditandoId;
+      closeModal('modalEditService');
+      openModal('modalDeleteService');
     });
   }
   const btnConfirmarExcluirServico = document.getElementById(
@@ -1098,49 +1099,39 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function abrirModalEditarOS(id) {
-    fetch('chamados_select.php')
-      .then((res) => res.json())
-      .then((data) => {
-        const os = Array.isArray(data)
-          ? data.find((c) => String(c.id) === String(id))
-          : null;
-        if (!os) return showSnackbar('OS não encontrada!', 'error');
-        osEditandoId = os.id;
-        const editOsNumberEl = document.getElementById('editOsNumber');
-        if (editOsNumberEl) {
-          editOsNumberEl.parentElement.querySelector(
-            'input[type="text"]'
-          ).value = os.numero_os || '';
-        }
-        document.getElementById('editClientName').value = os.cliente || '';
-        document.getElementById('editAttendant').value = os.atendente || '';
-        document.getElementById('editPhone').value = os.telefone || '';
-        document.getElementById('editItem').value = os.item || '';
-        const formatDate = (dateStr) => (dateStr ? dateStr.split(' ')[0] : '');
-        document.getElementById('editEntryDate').value = formatDate(
-          os.data_entrada
-        );
-        document.getElementById('editExitDate').value = formatDate(
-          os.data_saida
-        );
-        document.getElementById('editDefectSolution').value =
-          os.defeito_solucao || '';
-        document.getElementById('selectServicoEditar').value =
-          os.servico_id || '';
-        document.getElementById('selectStatusEditar').value = os.status || '';
-        document.getElementById('valorTotalEditar').value =
-          os.valor_total != null
-            ? parseFloat(os.valor_total).toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-              })
-            : '';
-        document.getElementById('selectRecebimentoEditar').value =
-          os.tipo_recebimento || 'comissao';
-        openModal('modalEditOS');
-        document
-          .getElementById('btnDeletarChamado')
-          .setAttribute('data-id', os.id);
-      });
+    const os = todasAsOrdens.find((c) => String(c.id) === String(id));
+    if (!os) {
+      showSnackbar('OS não encontrada!', 'error');
+      return;
+    }
+    osEditandoId = os.id;
+    document.getElementById('editOsNumber').textContent = os.numero_os
+      ? `#${os.numero_os}`
+      : '';
+    document.getElementById('editOsInput').value = os.numero_os || '';
+    document.getElementById('editClientName').value = os.cliente || '';
+    document.getElementById('editAttendant').value = os.atendente || '';
+    document.getElementById('editPhone').value = os.telefone || '';
+    document.getElementById('editItem').value = os.item || '';
+    const formatDate = (dateStr) => (dateStr ? dateStr.split(' ')[0] : '');
+    document.getElementById('editEntryDate').value = formatDate(
+      os.data_entrada
+    );
+    document.getElementById('editExitDate').value = formatDate(os.data_saida);
+    document.getElementById('editDefectSolution').value =
+      os.defeito_solucao || '';
+    document.getElementById('selectServicoEditar').value = os.servico_id || '';
+    document.getElementById('selectStatusEditar').value = os.status || '';
+    document.getElementById('valorTotalEditar').value =
+      os.valor_total != null
+        ? parseFloat(os.valor_total).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+          })
+        : '';
+    document.getElementById('selectRecebimentoEditar').value =
+      os.tipo_recebimento || 'comissao';
+    document.getElementById('btnDeletarChamado').setAttribute('data-id', os.id);
+    openModal('modalEditOS');
   }
   const btnSalvarEdicaoOS = document.querySelector(
     '#modalEditOS .bg-accent-blue'
@@ -1156,11 +1147,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       const payload = {
         id: osEditandoId,
-        numero_os: document
-          .querySelector(
-            '#modalEditOS input[placeholder="Número da OS externa"]'
-          )
-          .value.trim(),
+        numero_os: document.getElementById('editOsInput').value.trim(),
         cliente: document.getElementById('editClientName').value.trim(),
         atendente: document.getElementById('editAttendant').value.trim(),
         telefone: document.getElementById('editPhone').value.trim(),

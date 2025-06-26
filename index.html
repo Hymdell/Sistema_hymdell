@@ -224,7 +224,7 @@
         <div class="fixed inset-0 flex items-center justify-center p-4">
             <div class="dark-texture rounded-lg shadow-xl w-full max-w-2xl animate-slideUp">
                 <div class="p-4 border-b border-dark-base flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-white">Editar Ordem de Serviço <span id="editOsNumber" class="text-accent-blue">#1025</span></h3>
+                    <h3 class="text-lg font-medium text-white">Editar Ordem de Serviço <span id="editOsNumber" class="text-accent-blue"></span></h3>
                     <button class="closeModal text-gray-400 hover:text-white">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -235,27 +235,27 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Número da OS (opcional)</label>
-                            <input type="text" value="1025" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" id="editOsInput" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="Número da OS externa" inputmode="numeric" pattern="[0-9]*">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
-                            <input type="text" id="editClientName" value="João Silva" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
+                            <input type="text" id="editClientName" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Atendente</label>
-                            <input type="text" id="editAttendant" value="Carlos Técnico" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
+                            <input type="text" id="editAttendant" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Telefone</label>
-                            <input type="text" id="editPhone" value="(11) 98765-4321" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="(99) 99999-9999">
+                            <input type="text" id="editPhone" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" placeholder="(99) 99999-9999">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Item</label>
-                            <input type="text" id="editItem" value="Notebook Dell" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
+                            <input type="text" id="editItem" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Data de Entrada</label>
-                            <input type="date" id="editEntryDate" value="2023-05-15" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
+                            <input type="date" id="editEntryDate" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Data Atualização</label>
@@ -267,7 +267,7 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-400 mb-1">Defeito/Solução</label>
-                            <textarea id="editDefectSolution" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20" required>Notebook não liga. Verificar fonte e bateria.</textarea>
+                            <textarea id="editDefectSolution" class="w-full rounded-md px-3 py-2 text-sm focus:outline-none h-20" required></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-400 mb-1">Serviço Prestado</label>
@@ -285,7 +285,7 @@
                             <label class="block text-sm font-medium text-gray-400 mb-1">Valor Total</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-2 text-gray-500">R$</span>
-                                <input type="text" id="valorTotalEditar" value="250,00" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly="">
+                                <input type="text" id="valorTotalEditar" class="w-full rounded-md pl-8 pr-3 py-2 text-sm focus:outline-none" readonly="">
                             </div>
                         </div>
                         <div>
@@ -295,10 +295,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-4 border-t border-dark-base flex justify-end space-x-3">
-                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
-                    <button class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar Alterações</button>
+                <div class="p-4 border-t border-dark-base flex justify-between items-center">
                     <button id="btnDeletarChamado" class="px-4 py-2 rounded-md bg-status-red text-white hover:bg-opacity-90 transition-colors duration-200">Excluir Chamado</button>
+                    <div class="space-x-3">
+                        <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
+                        <button class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar Alterações</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -509,9 +511,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-4 border-t border-dark-base flex justify-end space-x-3">
-                    <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
-                    <button id="btnSalvarEdicaoServico" class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar Alterações</button>
+                <div class="p-4 border-t border-dark-base flex justify-between items-center">
+                    <button id="btnExcluirServicoDoModal" class="px-4 py-2 rounded-md bg-status-red text-white hover:bg-opacity-90 transition-colors duration-200">Excluir</button>
+                    <div class="space-x-3">
+                        <button class="closeModal px-4 py-2 rounded-md bg-dark-elevated hover:bg-dark-surface text-gray-300 transition-colors duration-200">Cancelar</button>
+                        <button id="btnSalvarEdicaoServico" class="px-4 py-2 rounded-md bg-accent-blue text-dark-base hover:bg-opacity-90 transition-colors duration-200">Salvar</button>
+                    </div>
                 </div>
             </div>
         </div>
