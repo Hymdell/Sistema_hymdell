@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     modalDeleteService: document.getElementById('modalDeleteService'),
     modalEditGoal: document.getElementById('modalEditGoal'),
   };
+  let todasAsOrdens = [];
   let todosOsServicos = [];
   let servicoEditandoId = null;
   let servicoExcluindoId = null;
@@ -978,58 +979,64 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function carregarChamados() {
-    fetch('chamados_select.php')
-      .then((res) => res.json())
-      .then((data) => {
-        const osTableBody = document.getElementById('osTableBody');
-        if (!osTableBody) return;
-        osTableBody.innerHTML = '';
-        if (data && Array.isArray(data) && data.length > 0) {
-          data.forEach((os) => {
-            function formatarDataHora(dataStr) {
-              if (!dataStr) return '-';
-              const dataObj = new Date(dataStr);
-              if (isNaN(dataObj.getTime())) return '-';
-              return dataObj
-                .toLocaleString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-                .replace(' ', ' às ');
-            }
+  function renderizarChamados(filtro = '') {
+    const osTableBody = document.getElementById('osTableBody');
+    if (!osTableBody) return;
+    const termoBusca = filtro.toLowerCase();
+    const ordensFiltradas = todasAsOrdens.filter((os) => {
+      const osNum = os.numero_os || '';
+      const cliente = os.cliente || '';
+      const item = os.item || '';
+      return (
+        osNum.toString().toLowerCase().includes(termoBusca) ||
+        cliente.toLowerCase().includes(termoBusca) ||
+        item.toLowerCase().includes(termoBusca)
+      );
+    });
+    osTableBody.innerHTML = '';
+    if (ordensFiltradas.length > 0) {
+      ordensFiltradas.forEach((os) => {
+        function formatarDataHora(dataStr) {
+          if (!dataStr) return '-';
+          const dataObj = new Date(dataStr);
+          if (isNaN(dataObj.getTime())) return '-';
+          return dataObj
+            .toLocaleString('pt-BR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+            .replace(',', ' às');
+        }
 
-            function getStatusBadge(status) {
-              if (!status) return '';
-              const statusStyles = {
-                Diagnosticando: 'bg-status-blue-bg text-status-blue-text',
-                'Aguardando Cliente':
-                  'bg-status-amber bg-opacity-20 text-status-amber',
-                'Aguardando Peça':
-                  'bg-status-fuchsia-bg text-status-fuchsia-text',
-                'Aguardando Retirada':
-                  'bg-status-slate-bg text-status-slate-text',
-                Concluído: 'bg-status-green bg-opacity-20 text-status-green',
-              };
-              const styleClass =
-                statusStyles[status] || 'bg-gray-200 text-gray-800';
-              return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${styleClass}">${status}</span>`;
-            }
-            let valor = '-';
-            if (os.valor_total != null && !isNaN(parseFloat(os.valor_total))) {
-              valor =
-                'R$ ' +
-                parseFloat(os.valor_total).toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                });
-            }
-            const tr = document.createElement('tr');
-            tr.className =
-              'os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30';
-            tr.innerHTML = `
+        function getStatusBadge(status) {
+          if (!status) return '';
+          const statusStyles = {
+            Diagnosticando: 'bg-status-blue-bg text-status-blue-text',
+            'Aguardando Cliente':
+              'bg-status-amber bg-opacity-20 text-status-amber',
+            'Aguardando Peça': 'bg-status-fuchsia-bg text-status-fuchsia-text',
+            'Aguardando Retirada': 'bg-status-slate-bg text-status-slate-text',
+            Concluído: 'bg-status-green bg-opacity-20 text-status-green',
+          };
+          const styleClass =
+            statusStyles[status] || 'bg-gray-200 text-gray-800';
+          return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${styleClass}">${status}</span>`;
+        }
+        let valor = '-';
+        if (os.valor_total != null && !isNaN(parseFloat(os.valor_total))) {
+          valor =
+            'R$ ' +
+            parseFloat(os.valor_total).toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            });
+        }
+        const tr = document.createElement('tr');
+        tr.className =
+          'os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30';
+        tr.innerHTML = `
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
                           os.numero_os || '-'
                         }</td>
@@ -1054,17 +1061,26 @@ document.addEventListener('DOMContentLoaded', function () {
                               os.id
                             }">Editar</button>
                         </td>`;
-            osTableBody.appendChild(tr);
-          });
-        } else {
-          osTableBody.innerHTML =
-            '<tr><td colspan="8" class="text-center text-gray-400 py-4">Nenhuma OS cadastrada.</td></tr>';
-        }
-        document.querySelectorAll('.btn-editar-os').forEach((btn) => {
-          btn.addEventListener('click', function () {
-            abrirModalEditarOS(this.getAttribute('data-id'));
-          });
-        });
+        osTableBody.appendChild(tr);
+      });
+    } else {
+      osTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-gray-400 py-4">${
+        filtro ? 'Nenhuma OS encontrada.' : 'Nenhuma OS cadastrada.'
+      }</td></tr>`;
+    }
+    document.querySelectorAll('.btn-editar-os').forEach((btn) => {
+      btn.addEventListener('click', function () {
+        abrirModalEditarOS(this.getAttribute('data-id'));
+      });
+    });
+  }
+
+  function carregarChamados() {
+    fetch('chamados_select.php')
+      .then((res) => res.json())
+      .then((data) => {
+        todasAsOrdens = Array.isArray(data) ? data : [];
+        renderizarChamados();
       })
       .catch(() => {
         const osTableBody = document.getElementById('osTableBody');
@@ -1074,17 +1090,28 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
   carregarChamados();
+  const searchOsInput = document.getElementById('searchOsInput');
+  if (searchOsInput) {
+    searchOsInput.addEventListener('input', (e) => {
+      renderizarChamados(e.target.value);
+    });
+  }
 
   function abrirModalEditarOS(id) {
     fetch('chamados_select.php')
       .then((res) => res.json())
       .then((data) => {
-        const os = data.find((c) => String(c.id) === String(id));
+        const os = Array.isArray(data)
+          ? data.find((c) => String(c.id) === String(id))
+          : null;
         if (!os) return showSnackbar('OS não encontrada!', 'error');
         osEditandoId = os.id;
-        document.getElementById('editOsNumber').textContent = os.numero_os
-          ? `#${os.numero_os}`
-          : '';
+        const editOsNumberEl = document.getElementById('editOsNumber');
+        if (editOsNumberEl) {
+          editOsNumberEl.parentElement.querySelector(
+            'input[type="text"]'
+          ).value = os.numero_os || '';
+        }
         document.getElementById('editClientName').value = os.cliente || '';
         document.getElementById('editAttendant').value = os.atendente || '';
         document.getElementById('editPhone').value = os.telefone || '';
@@ -1098,10 +1125,8 @@ document.addEventListener('DOMContentLoaded', function () {
         );
         document.getElementById('editDefectSolution').value =
           os.defeito_solucao || '';
-        const selectServicoEditar = document.getElementById(
-          'selectServicoEditar'
-        );
-        selectServicoEditar.value = os.servico_id || '';
+        document.getElementById('selectServicoEditar').value =
+          os.servico_id || '';
         document.getElementById('selectStatusEditar').value = os.status || '';
         document.getElementById('valorTotalEditar').value =
           os.valor_total != null
@@ -1132,9 +1157,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const payload = {
         id: osEditandoId,
         numero_os: document
-          .getElementById('editOsNumber')
-          .textContent.replace('#', '')
-          .trim(),
+          .querySelector(
+            '#modalEditOS input[placeholder="Número da OS externa"]'
+          )
+          .value.trim(),
         cliente: document.getElementById('editClientName').value.trim(),
         atendente: document.getElementById('editAttendant').value.trim(),
         telefone: document.getElementById('editPhone').value.trim(),
