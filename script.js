@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
     modalDeleteService: document.getElementById('modalDeleteService'),
     modalEditGoal: document.getElementById('modalEditGoal'),
   };
+  let todosOsServicos = [];
+  let servicoEditandoId = null;
+  let servicoExcluindoId = null;
+  let osEditandoId = null;
+  let visaoGrafico = 'anual';
   document
     .getElementById('btnAddOS')
     .addEventListener('click', () => openModal('modalAddOS'));
@@ -21,13 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('btnManageServices').addEventListener('click', () => {
     openModal('modalManageServices');
     carregarServicos();
-  });
-  document.querySelectorAll('.edit-os-btn').forEach((button) => {
-    button.addEventListener('click', function () {
-      const osNumber = this.getAttribute('data-os');
-      document.getElementById('editOsNumber').textContent = `#${osNumber}`;
-      openModal('modalEditOS');
-    });
   });
   document
     .getElementById('btnMobileActions')
@@ -52,23 +50,29 @@ document.addEventListener('DOMContentLoaded', function () {
     button.addEventListener('click', closeAllModals);
   });
   Object.values(modals).forEach((modal) => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeAllModals();
-    });
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAllModals();
+      });
+    }
   });
 
   function openModal(modalId) {
     closeAllModals();
-    modals[modalId].classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    if (modalId === 'modalCharts') {
-      animateChartBars();
+    if (modals[modalId]) {
+      modals[modalId].classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      if (modalId === 'modalCharts') {
+        animateChartBars();
+      }
     }
   }
 
   function closeAllModals() {
     Object.values(modals).forEach((modal) => {
-      modal.classList.add('hidden');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
     });
     document.body.style.overflow = '';
   }
@@ -95,84 +99,65 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }, 300);
   }
-  document.getElementById('filtroAno').addEventListener('change', function () {
-    const bars = document.querySelectorAll('.chart-bar');
-    const randomHeights = [
-      Math.floor(Math.random() * 60) + 20 + '%',
-      Math.floor(Math.random() * 60) + 20 + '%',
-      Math.floor(Math.random() * 60) + 20 + '%',
-      Math.floor(Math.random() * 60) + 20 + '%',
-      Math.floor(Math.random() * 60) + 20 + '%',
-      Math.floor(Math.random() * 60) + 20 + '%',
-    ];
-    bars.forEach((bar, index) => {
-      bar.style.setProperty('--target-height', randomHeights[index]);
-      bar.style.height = '0%';
-    });
-    setTimeout(() => {
+  const filtroAnoGrafico = document.getElementById('filtroAno');
+  if (filtroAnoGrafico) {
+    filtroAnoGrafico.addEventListener('change', function () {
+      const bars = document.querySelectorAll('.chart-bar');
+      const randomHeights = [
+        Math.floor(Math.random() * 60) + 20 + '%',
+        Math.floor(Math.random() * 60) + 20 + '%',
+        Math.floor(Math.random() * 60) + 20 + '%',
+        Math.floor(Math.random() * 60) + 20 + '%',
+        Math.floor(Math.random() * 60) + 20 + '%',
+        Math.floor(Math.random() * 60) + 20 + '%',
+      ];
       bars.forEach((bar, index) => {
-        bar.style.height = randomHeights[index];
+        bar.style.setProperty('--target-height', randomHeights[index]);
+        bar.style.height = '0%';
       });
-    }, 100);
-  });
-  document
-    .getElementById('selectServico')
-    .addEventListener('change', function () {
-      const valorInput = document.getElementById('valorTotal');
-      const valorSelecionado = this.value;
-      if (valorSelecionado) {
-        const valorFormatado = parseFloat(valorSelecionado)
-          .toFixed(2)
-          .replace('.', ',');
-        valorInput.value = valorFormatado;
-      } else {
-        valorInput.value = '';
-      }
+      setTimeout(() => {
+        bars.forEach((bar, index) => {
+          bar.style.height = randomHeights[index];
+        });
+      }, 100);
     });
-  document
-    .getElementById('selectServicoEditar')
-    .addEventListener('change', function () {
-      const valorInput = document.getElementById('valorTotalEditar');
-      const valorSelecionado = this.value;
-      if (valorSelecionado) {
-        const valorFormatado = parseFloat(valorSelecionado)
-          .toFixed(2)
-          .replace('.', ',');
-        valorInput.value = valorFormatado;
-      } else {
-        valorInput.value = '';
-      }
-    });
+  }
 
   function atualizarValorTotalOS() {
     const selectServico = document.getElementById('selectServico');
     const valorInput = document.getElementById('valorTotal');
-    let valorBase = parseFloat(selectServico.value);
-    if (isNaN(valorBase)) {
+    const selectedOption = selectServico.options[selectServico.selectedIndex];
+    const valorBase = selectedOption.getAttribute('data-valor');
+    if (!valorBase) {
       valorInput.value = '';
       return;
     }
-    valorInput.value = valorBase.toFixed(2).replace('.', ',');
+    valorInput.value = parseFloat(valorBase).toFixed(2).replace('.', ',');
   }
-  document
-    .getElementById('selectServico')
-    .addEventListener('change', atualizarValorTotalOS);
+  const selectServico = document.getElementById('selectServico');
+  if (selectServico) {
+    selectServico.addEventListener('change', atualizarValorTotalOS);
+  }
 
   function atualizarValorTotalEditOS() {
     const selectServicoEditar = document.getElementById('selectServicoEditar');
     const valorInput = document.getElementById('valorTotalEditar');
-    let valorBase = parseFloat(selectServicoEditar.value);
-    if (isNaN(valorBase)) {
+    const selectedOption =
+      selectServicoEditar.options[selectServicoEditar.selectedIndex];
+    const valorBase = selectedOption.getAttribute('data-valor');
+    if (!valorBase) {
       valorInput.value = '';
       return;
     }
-    valorInput.value = valorBase.toFixed(2).replace('.', ',');
+    valorInput.value = parseFloat(valorBase).toFixed(2).replace('.', ',');
   }
-  document
-    .getElementById('selectServicoEditar')
-    .addEventListener('change', atualizarValorTotalEditOS);
+  const selectServicoEditar = document.getElementById('selectServicoEditar');
+  if (selectServicoEditar) {
+    selectServicoEditar.addEventListener('change', atualizarValorTotalEditOS);
+  }
 
   function maskPhone(input) {
+    if (!input) return;
     input.addEventListener('input', function () {
       let v = input.value.replace(/\D/g, '');
       if (v.length > 11) v = v.slice(0, 11);
@@ -182,8 +167,10 @@ document.addEventListener('DOMContentLoaded', function () {
         input.value = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
       } else if (v.length > 2) {
         input.value = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+      } else if (v.length > 0) {
+        input.value = v.replace(/(\d*)/, '($1');
       } else {
-        input.value = v;
+        input.value = '';
       }
     });
   }
@@ -202,29 +189,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const item = getValue('item');
     const entryDate = getValue('entryDate');
     const defectSolution = getValue('defectSolution');
-    const osNumber = getValue('osNumber');
-    const phone = getValue('phone');
-    if (osNumber && !/^[\d]+$/.test(osNumber)) {
-      errors.push('Número da OS deve conter apenas números.');
-    }
-    if (!clientName) {
-      errors.push('Nome do Cliente é obrigatório.');
-    }
-    if (!attendant) {
-      errors.push('Atendente é obrigatório.');
-    }
-    if (phone && !/^\(\d{2}\) \d{4,5}-\d{4}$/.test(phone)) {
-      errors.push('Telefone inválido. Use o formato (99) 99999-9999.');
-    }
-    if (!item) {
-      errors.push('Item é obrigatório.');
-    }
-    if (!entryDate) {
-      errors.push('Data de Entrada é obrigatória.');
-    }
-    if (!defectSolution) {
-      errors.push('Defeito/Solução é obrigatório.');
-    }
+    if (!clientName) errors.push('Nome do Cliente é obrigatório.');
+    if (!attendant) errors.push('Atendente é obrigatório.');
+    if (!item) errors.push('Item é obrigatório.');
+    if (!entryDate) errors.push('Data de Entrada é obrigatória.');
+    if (!defectSolution) errors.push('Defeito/Solução é obrigatório.');
     return errors;
   }
 
@@ -254,15 +223,15 @@ document.addEventListener('DOMContentLoaded', function () {
   maskPhone(document.getElementById('editPhone'));
 
   function maskMoney(input) {
-    input.addEventListener('input', function () {
-      let v = input.value.replace(/\D/g, '');
-      v = (parseInt(v, 10) / 100).toFixed(2) + '';
+    if (!input) return;
+    input.addEventListener('input', function (e) {
+      let v = e.target.value.replace(/\D/g, '');
+      v = (v / 100).toFixed(2) + '';
       v = v.replace('.', ',');
-      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-      input.value = v;
+      v = v.replace(/(\d)(?=(\d{3})+(\d{2})*,)/g, '$1.');
+      e.target.value = v;
     });
   }
-  const serviceName = document.getElementById('serviceName');
   const servicePrice = document.getElementById('servicePrice');
   const serviceCommission = document.getElementById('serviceCommission');
   const btnUpdateCommission = document.getElementById('btnUpdateCommission');
@@ -284,10 +253,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function validateServiceForm() {
     const errors = [];
-    const nome = serviceName ? serviceName.value.trim() : '';
-    const preco = servicePrice ? servicePrice.value.trim() : '';
+    const nome = document.getElementById('serviceName')
+      ? document.getElementById('serviceName').value.trim()
+      : '';
+    const preco = document.getElementById('servicePrice')
+      ? document.getElementById('servicePrice').value.trim()
+      : '';
     if (!nome) errors.push('Nome do Serviço é obrigatório.');
-    if (!preco || isNaN(parseFloat(preco.replace('.', '').replace(',', '.'))))
+    if (!preco || isNaN(parseFloat(preco.replace(/\./g, '').replace(',', '.'))))
       errors.push(
         'Preço Total do Serviço é obrigatório e deve ser um valor válido.'
       );
@@ -310,9 +283,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const errorDiv = document.getElementById('serviceFormErrors');
     if (errorDiv) errorDiv.innerHTML = '';
   }
-  document
-    .querySelector('#modalAddService .bg-accent-amber')
-    .addEventListener('click', function (e) {
+  const btnSalvarServico = document.querySelector(
+    '#modalAddService .bg-accent-amber'
+  );
+  if (btnSalvarServico) {
+    btnSalvarServico.addEventListener('click', function (e) {
       clearServiceFormErrors();
       const errors = validateServiceForm();
       if (errors.length) {
@@ -321,18 +296,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
     });
+  }
 
   function fillSelectOptions() {
     fetch('servicos_select.php')
       .then((res) => res.json())
       .then((servicos) => {
+        if (!Array.isArray(servicos)) return;
+        servicos.sort((a, b) => a.nome.localeCompare(b.nome));
         const selectServico = document.getElementById('selectServico');
         if (selectServico) {
-          selectServico.innerHTML = '';
-          const opt = document.createElement('option');
-          opt.value = '';
-          opt.textContent = 'Selecione um serviço';
-          selectServico.appendChild(opt);
+          selectServico.innerHTML =
+            '<option value="">Selecione um serviço</option>';
           servicos.forEach((s) => {
             const o = document.createElement('option');
             o.value = s.id;
@@ -345,11 +320,8 @@ document.addEventListener('DOMContentLoaded', function () {
           'selectServicoEditar'
         );
         if (selectServicoEditar) {
-          selectServicoEditar.innerHTML = '';
-          const opt = document.createElement('option');
-          opt.value = '';
-          opt.textContent = 'Selecione um serviço';
-          selectServicoEditar.appendChild(opt);
+          selectServicoEditar.innerHTML =
+            '<option value="">Selecione um serviço</option>';
           servicos.forEach((s) => {
             const o = document.createElement('option');
             o.value = s.id;
@@ -388,32 +360,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   fillSelectOptions();
-  document
-    .getElementById('selectServico')
-    .addEventListener('change', function () {
-      const valorInput = document.getElementById('valorTotal');
-      const selected = this.options[this.selectedIndex];
-      const valor = selected.getAttribute('data-valor');
-      if (valor) {
-        valorInput.value = parseFloat(valor).toFixed(2).replace('.', ',');
-      } else {
-        valorInput.value = '';
-      }
-    });
-  document
-    .getElementById('selectServicoEditar')
-    .addEventListener('change', function () {
-      const valorInput = document.getElementById('valorTotalEditar');
-      const selected = this.options[this.selectedIndex];
-      const valor = selected.getAttribute('data-valor');
-      if (valor) {
-        valorInput.value = parseFloat(valor).toFixed(2).replace('.', ',');
-      } else {
-        valorInput.value = '';
-      }
-    });
   const chartData = {
-    anos: [2025],
+    anos: [new Date().getFullYear()],
     meses: [
       'Jan',
       'Fev',
@@ -429,33 +377,14 @@ document.addEventListener('DOMContentLoaded', function () {
       'Dez',
     ],
     valoresPorAno: {
-      2025: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [new Date().getFullYear()]: Array(12).fill(0),
     },
     meta: 0,
   };
 
   function fillYearFilter() {
-    const filtroAno = document.getElementById('filtroAno');
-    filtroAno.innerHTML = '';
-    chartData.anos.forEach((ano) => {
-      const opt = document.createElement('option');
-      opt.value = ano;
-      opt.textContent = ano;
-      filtroAno.appendChild(opt);
-    });
-  }
-  if (document.getElementById('filtroAno')) {
-    fillYearFilter();
-    updateChart(chartData.anos[0]);
-    document
-      .getElementById('filtroAno')
-      .addEventListener('change', function () {
-        updateChart(this.value);
-      });
-  }
-
-  function fillYearFilter() {
     const yearFilter = document.getElementById('filtroAno');
+    if (!yearFilter) return;
     yearFilter.innerHTML = '';
     chartData.anos.forEach((ano) => {
       const opt = document.createElement('option');
@@ -467,21 +396,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fillChartYAxis(maxValue) {
     const yAxis = document.getElementById('chartYAxis');
+    if (!yAxis) return;
     yAxis.innerHTML = '';
+    const maxVal = maxValue > 0 ? maxValue : 1000;
     for (let i = 5; i >= 0; i--) {
-      const valor = Math.round((maxValue * i) / 5);
+      const valor = Math.round((maxVal * i) / 5);
       const span = document.createElement('span');
-      span.textContent =
-        'R$ ' +
-        valor.toLocaleString('pt-BR', {
-          minimumFractionDigits: 0,
-        });
+      span.textContent = 'R$ ' + valor.toLocaleString('pt-BR');
       yAxis.appendChild(span);
     }
   }
 
   function fillChartXAxis() {
     const xAxis = document.getElementById('chartXAxis');
+    if (!xAxis) return;
     xAxis.innerHTML = '';
     chartData.meses.forEach((mes) => {
       const span = document.createElement('span');
@@ -492,6 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fillChartReferenceLines() {
     const refLines = document.getElementById('chartReferenceLines');
+    if (!refLines) return;
     refLines.innerHTML = '';
     for (let i = 0; i < 5; i++) {
       const div = document.createElement('div');
@@ -502,16 +431,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fillChartBars(ano) {
     const barsContainer = document.getElementById('chartBarsContainer');
+    if (!barsContainer) return;
     barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
     const valores = chartData.valoresPorAno[ano] || [];
     const max = Math.max(...valores, chartData.meta || 0);
-    valores.forEach((valor, idx) => {
+    const maxVal = max > 0 ? max : 1;
+    valores.forEach((valor) => {
       const bar = document.createElement('div');
       bar.className = 'flex-1 flex items-end justify-center';
       const barInner = document.createElement('div');
       barInner.className =
         'w-10 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
-      const altura = max > 0 ? (valor / max) * 80 + 10 : 0;
+      const altura = (valor / maxVal) * 90;
       barInner.style.setProperty('--target-height', altura + '%');
       barInner.style.height = '0%';
       bar.appendChild(barInner);
@@ -521,8 +452,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (goalLine) {
       const meta = chartData.meta || 0;
       if (meta > 0 && max > 0) {
-        const metaPercent = (meta / max) * 80 + 10;
-        goalLine.style.top = 100 - metaPercent + '%';
+        const metaPercent = (meta / max) * 90;
+        goalLine.style.bottom = metaPercent + '%';
         goalLine.style.display = '';
       } else {
         goalLine.style.display = 'none';
@@ -561,56 +492,79 @@ document.addEventListener('DOMContentLoaded', function () {
   const btnDeletarChamado = document.getElementById('btnDeletarChamado');
   if (btnDeletarChamado) {
     btnDeletarChamado.addEventListener('click', function () {
-      if (
-        !confirm(
-          'Tem certeza que deseja excluir este chamado? Essa ação não pode ser desfeita.'
-        )
-      )
-        return;
       const osId = btnDeletarChamado.getAttribute('data-id');
       if (!osId) {
         showSnackbar('ID do chamado não encontrado.', 'error');
         return;
       }
-      fetch('chamados_delete.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: osId,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            showSnackbar('Chamado excluído com sucesso!', 'success');
-            closeAllModals();
-            carregarChamados();
-          } else {
-            showSnackbar(
-              'Erro ao excluir chamado: ' +
-                (data.error || 'Erro desconhecido.'),
-              'error'
-            );
-          }
-        })
-        .catch(() =>
-          showSnackbar('Erro de comunicação com o servidor.', 'error')
-        );
+      excluirChamado(osId);
     });
   }
-  const btnManageServices = document.getElementById('btnManageServices');
-  const modalManageServices = document.getElementById('modalManageServices');
-  const servicesTableBody = document.getElementById('servicesTableBody');
-  const modalEditService = document.getElementById('modalEditService');
-  const modalDeleteService = document.getElementById('modalDeleteService');
-  let servicoEditandoId = null;
-  let servicoExcluindoId = null;
-  if (btnManageServices) {
-    btnManageServices.addEventListener('click', function () {
-      openModal('modalManageServices');
-      carregarServicos();
+
+  function renderizarServicos(filtro = '') {
+    const servicesTableBody = document.getElementById('servicesTableBody');
+    if (!servicesTableBody) return;
+    const termoBusca = filtro.toLowerCase();
+    const servicosFiltrados = todosOsServicos.filter((servico) =>
+      servico.nome.toLowerCase().includes(termoBusca)
+    );
+    servicosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
+    servicesTableBody.innerHTML = '';
+    if (servicosFiltrados.length > 0) {
+      servicosFiltrados.forEach((servico) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+                    <td class="px-4 py-2 text-gray-200">${servico.nome}</td>
+                    <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                      servico.valor
+                    ).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })}</td>
+                    <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
+                      servico.comissao
+                    ).toLocaleString('pt-BR', {
+                      minimumFractionDigits: 2,
+                    })}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button class="btn-editar-servico text-accent-blue hover:underline mr-2" data-id="${
+                          servico.id
+                        }" data-nome="${servico.nome}" data-valor="${
+          servico.valor
+        }" data-comissao="${servico.comissao}">Editar</button>
+                        <button class="btn-excluir-servico text-status-red hover:underline" data-id="${
+                          servico.id
+                        }">Excluir</button>
+                    </td>`;
+        servicesTableBody.appendChild(tr);
+      });
+    } else {
+      servicesTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 py-4">${
+        filtro ? 'Nenhum serviço encontrado.' : 'Nenhum serviço cadastrado.'
+      }</td></tr>`;
+    }
+    document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
+      btn.addEventListener('click', function () {
+        servicoEditandoId = this.getAttribute('data-id');
+        document.getElementById('editServiceName').value =
+          this.getAttribute('data-nome');
+        document.getElementById('editServicePrice').value = parseFloat(
+          this.getAttribute('data-valor')
+        ).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+        });
+        document.getElementById('editServiceCommission').value = parseFloat(
+          this.getAttribute('data-comissao')
+        ).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+        });
+        openModal('modalEditService');
+      });
+    });
+    document.querySelectorAll('.btn-excluir-servico').forEach((btn) => {
+      btn.addEventListener('click', function () {
+        servicoExcluindoId = this.getAttribute('data-id');
+        openModal('modalDeleteService');
+      });
     });
   }
 
@@ -618,64 +572,22 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch('servicos_select.php')
       .then((res) => res.json())
       .then((data) => {
-        servicesTableBody.innerHTML = '';
-        if (data && Array.isArray(data)) {
-          data.forEach((servico) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td class="px-4 py-2 text-gray-200">${servico.nome}</td>
-              <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
-                servico.valor
-              ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-              <td class="px-4 py-2 text-gray-200">R$ ${parseFloat(
-                servico.comissao
-              ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-              <td class="px-4 py-2 text-center">
-                <button class="btn-editar-servico text-accent-blue hover:underline mr-2" data-id="${
-                  servico.id
-                }" data-nome="${servico.nome}" data-valor="${
-              servico.valor
-            }" data-comissao="${servico.comissao}">Editar</button>
-                <button class="btn-excluir-servico text-status-red hover:underline" data-id="${
-                  servico.id
-                }">Excluir</button>
-              </td>
-            `;
-            servicesTableBody.appendChild(tr);
-          });
-        } else {
-          servicesTableBody.innerHTML =
-            '<tr><td colspan="4" class="text-center text-gray-400 py-4">Nenhum serviço cadastrado.</td></tr>';
-        }
-        document.querySelectorAll('.btn-editar-servico').forEach((btn) => {
-          btn.addEventListener('click', function () {
-            servicoEditandoId = this.getAttribute('data-id');
-            document.getElementById('editServiceName').value =
-              this.getAttribute('data-nome');
-            document.getElementById('editServicePrice').value = parseFloat(
-              this.getAttribute('data-valor')
-            ).toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-            });
-            document.getElementById('editServiceCommission').value = parseFloat(
-              this.getAttribute('data-comissao')
-            ).toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-            });
-            openModal('modalEditService');
-          });
-        });
-        document.querySelectorAll('.btn-excluir-servico').forEach((btn) => {
-          btn.addEventListener('click', function () {
-            servicoExcluindoId = this.getAttribute('data-id');
-            openModal('modalDeleteService');
-          });
-        });
+        todosOsServicos = Array.isArray(data) ? data : [];
+        renderizarServicos();
       })
       .catch(() => {
-        servicesTableBody.innerHTML =
-          '<tr><td colspan="4" class="text-center text-red-400 py-4">Erro ao carregar serviços.</td></tr>';
+        const servicesTableBody = document.getElementById('servicesTableBody');
+        if (servicesTableBody) {
+          servicesTableBody.innerHTML =
+            '<tr><td colspan="4" class="text-center text-red-400 py-4">Erro ao carregar serviços.</td></tr>';
+        }
       });
+  }
+  const searchServicoInput = document.getElementById('searchServico');
+  if (searchServicoInput) {
+    searchServicoInput.addEventListener('input', (e) => {
+      renderizarServicos(e.target.value);
+    });
   }
   const btnSalvarEdicaoServico = document.getElementById(
     'btnSalvarEdicaoServico'
@@ -685,11 +597,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const nome = document.getElementById('editServiceName').value.trim();
       const valor = document
         .getElementById('editServicePrice')
-        .value.replace('.', '')
+        .value.replace(/\./g, '')
         .replace(',', '.');
       const comissao = document
         .getElementById('editServiceCommission')
-        .value.replace('.', '')
+        .value.replace(/\./g, '')
         .replace(',', '.');
       if (!nome || isNaN(parseFloat(valor)) || isNaN(parseFloat(comissao))) {
         showSnackbar('Preencha todos os campos corretamente.', 'error');
@@ -713,6 +625,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showSnackbar('Serviço atualizado com sucesso!', 'success');
             closeAllModals();
             carregarServicos();
+            fillSelectOptions();
           } else {
             showSnackbar(
               'Erro ao atualizar serviço: ' +
@@ -747,6 +660,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showSnackbar('Serviço excluído com sucesso!', 'success');
             closeAllModals();
             carregarServicos();
+            fillSelectOptions();
           } else {
             showSnackbar(
               'Erro ao excluir serviço: ' +
@@ -764,24 +678,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const editServiceCommission = document.getElementById(
     'editServiceCommission'
   );
-  if (editServicePrice) {
-    editServicePrice.addEventListener('input', function () {
-      let v = this.value.replace(/\D/g, '');
-      v = (parseInt(v, 10) / 100).toFixed(2) + '';
-      v = v.replace('.', ',');
-      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-      this.value = v;
-    });
-  }
-  if (editServiceCommission) {
-    editServiceCommission.addEventListener('input', function () {
-      let v = this.value.replace(/\D/g, '');
-      v = (parseInt(v, 10) / 100).toFixed(2) + '';
-      v = v.replace('.', ',');
-      v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-      this.value = v;
-    });
-  }
+  if (editServicePrice) maskMoney(editServicePrice);
+  if (editServiceCommission) maskMoney(editServiceCommission);
   const btnEditGoal = document.getElementById('btnEditGoal');
   if (btnEditGoal) {
     btnEditGoal.addEventListener('click', () => {
@@ -848,6 +746,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fillChartXAxisDias(ano, mes) {
     const xAxis = document.getElementById('chartXAxis');
+    if (!xAxis) return;
     xAxis.innerHTML = '';
     const dias = getDiasNoMes(ano, mes);
     for (let d = 1; d <= dias; d++) {
@@ -859,16 +758,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function fillChartBarsDias(ano, mes) {
     const barsContainer = document.getElementById('chartBarsContainer');
+    if (!barsContainer) return;
     barsContainer.querySelectorAll('.chart-bar').forEach((e) => e.remove());
     const valores = (chartDataDiario[ano] && chartDataDiario[ano][mes]) || [];
     const max = Math.max(...valores, chartData.meta || 0);
-    valores.forEach((valor, idx) => {
+    const maxVal = max > 0 ? max : 1;
+    valores.forEach((valor) => {
       const bar = document.createElement('div');
       bar.className = 'flex-1 flex items-end justify-center';
       const barInner = document.createElement('div');
       barInner.className =
         'w-4 bg-accent-blue bg-opacity-80 rounded-t-sm chart-bar';
-      const altura = max > 0 ? (valor / max) * 80 + 10 : 0;
+      const altura = (valor / maxVal) * 90;
       barInner.style.setProperty('--target-height', altura + '%');
       barInner.style.height = '0%';
       bar.appendChild(barInner);
@@ -878,8 +779,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (goalLine) {
       const meta = chartData.meta || 0;
       if (meta > 0 && max > 0) {
-        const metaPercent = (meta / max) * 80 + 10;
-        goalLine.style.top = 100 - metaPercent + '%';
+        const metaPercent = (meta / max) * 90;
+        goalLine.style.bottom = metaPercent + '%';
         goalLine.style.display = '';
       } else {
         goalLine.style.display = 'none';
@@ -913,39 +814,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const filtroAno = document.getElementById('filtroAno');
     const filtroMes = document.getElementById('filtroMes');
     filtroMes.value = (new Date().getMonth() + 1).toString();
-    filtroAno.addEventListener('change', function () {
-      updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
-    });
-    filtroMes.addEventListener('change', function () {
-      updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
-    });
-    updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
-  }
-  let visaoGrafico = 'anual';
-  const toggleVisaoGrafico = document.getElementById('toggleVisaoGrafico');
-  if (
-    toggleVisaoGrafico &&
-    document.getElementById('filtroAno') &&
-    document.getElementById('filtroMes')
-  ) {
-    const filtroAno = document.getElementById('filtroAno');
-    const filtroMes = document.getElementById('filtroMes');
+    const toggleVisaoGrafico = document.getElementById('toggleVisaoGrafico');
 
     function atualizarVisaoGrafico() {
       if (visaoGrafico === 'anual') {
-        toggleVisaoGrafico.textContent = 'Anual';
+        if (toggleVisaoGrafico) toggleVisaoGrafico.textContent = 'Anual';
         filtroMes.disabled = true;
         updateChart(Number(filtroAno.value));
       } else {
-        toggleVisaoGrafico.textContent = 'Mensal';
+        if (toggleVisaoGrafico) toggleVisaoGrafico.textContent = 'Mensal';
         filtroMes.disabled = false;
         updateChartDiario(Number(filtroAno.value), Number(filtroMes.value));
       }
     }
-    toggleVisaoGrafico.addEventListener('click', function () {
-      visaoGrafico = visaoGrafico === 'anual' ? 'mensal' : 'anual';
-      atualizarVisaoGrafico();
-    });
+    if (toggleVisaoGrafico) {
+      toggleVisaoGrafico.addEventListener('click', function () {
+        visaoGrafico = visaoGrafico === 'anual' ? 'mensal' : 'anual';
+        atualizarVisaoGrafico();
+      });
+    }
     filtroAno.addEventListener('change', atualizarVisaoGrafico);
     filtroMes.addEventListener('change', function () {
       if (visaoGrafico === 'mensal') atualizarVisaoGrafico();
@@ -967,8 +854,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function inserirOuAtualizarMeta(ano, mes, valor) {
     return buscarMeta(ano, mes).then((meta) => {
+      const formData = new FormData();
       if (meta) {
-        const formData = new FormData();
         formData.append('id', meta.id);
         formData.append('valor', valor);
         return fetch('meta_update.php', {
@@ -976,7 +863,6 @@ document.addEventListener('DOMContentLoaded', function () {
           body: formData,
         }).then((res) => res.json());
       } else {
-        const formData = new FormData();
         formData.append('ano', ano);
         formData.append('mes', mes);
         formData.append('valor', valor);
@@ -987,15 +873,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-
-  function deletarMeta(id) {
-    const formData = new FormData();
-    formData.append('id', id);
-    return fetch('meta_delete.php', {
-      method: 'POST',
-      body: formData,
-    }).then((res) => res.json());
-  }
   if (btnEditGoal) {
     btnEditGoal.addEventListener('click', () => {
       openModal('modalEditGoal');
@@ -1004,48 +881,36 @@ document.addEventListener('DOMContentLoaded', function () {
       const selectMes = document.getElementById('inputMetaMes');
       const selectAno = document.getElementById('inputMetaAno');
       if (selectMes) selectMes.value = mesAtual;
-      buscarMeta(selectAno.value, selectMes.value).then((meta) => {
-        document.getElementById('inputMetaMensal').value = meta
-          ? Number(meta.valor).toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-            })
-          : '';
-        document
-          .getElementById('inputMetaMensal')
-          .setAttribute('data-meta-id', meta ? meta.id : '');
-      });
-      selectAno.addEventListener('change', function () {
-        buscarMeta(this.value, selectMes.value).then((meta) => {
-          document.getElementById('inputMetaMensal').value = meta
+      const inputMetaMensal = document.getElementById('inputMetaMensal');
+      const carregarMeta = (ano, mes) => {
+        buscarMeta(ano, mes).then((meta) => {
+          inputMetaMensal.value = meta
             ? Number(meta.valor).toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
               })
             : '';
-          document
-            .getElementById('inputMetaMensal')
-            .setAttribute('data-meta-id', meta ? meta.id : '');
+          inputMetaMensal.setAttribute('data-meta-id', meta ? meta.id : '');
         });
-      });
-      selectMes.addEventListener('change', function () {
-        buscarMeta(selectAno.value, this.value).then((meta) => {
-          document.getElementById('inputMetaMensal').value = meta
-            ? Number(meta.valor).toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-              })
-            : '';
-          document
-            .getElementById('inputMetaMensal')
-            .setAttribute('data-meta-id', meta ? meta.id : '');
-        });
-      });
+      };
+      if (selectAno && selectMes) {
+        carregarMeta(selectAno.value, selectMes.value);
+        selectAno.addEventListener('change', () =>
+          carregarMeta(selectAno.value, selectMes.value)
+        );
+        selectMes.addEventListener('change', () =>
+          carregarMeta(selectAno.value, selectMes.value)
+        );
+      }
     });
   }
   if (btnSalvarMeta) {
     btnSalvarMeta.addEventListener('click', function () {
       const ano = document.getElementById('inputMetaAno').value;
       const mes = document.getElementById('inputMetaMes').value;
-      let mensal = document.getElementById('inputMetaMensal').value;
-      mensal = mensal.replace(/\./g, '').replace(',', '.');
+      let mensal = document
+        .getElementById('inputMetaMensal')
+        .value.replace(/\./g, '')
+        .replace(',', '.');
       if (!ano || !mes || !mensal || isNaN(Number(mensal))) {
         showSnackbar('Preencha todos os campos corretamente.', 'error');
         return;
@@ -1063,9 +928,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-  const btnSalvarServico = document.querySelector(
-    '#modalAddService .bg-accent-amber'
-  );
   if (btnSalvarServico) {
     btnSalvarServico.addEventListener('click', function (e) {
       clearServiceFormErrors();
@@ -1075,10 +937,14 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         return;
       }
-      const nome = serviceName.value.trim();
-      const valor = servicePrice.value.replace(/\./g, '').replace(',', '.');
-      const comissao = serviceCommission.value
-        .replace(/\./g, '')
+      const nome = document.getElementById('serviceName').value.trim();
+      const valor = document
+        .getElementById('servicePrice')
+        .value.replace(/\./g, '')
+        .replace(',', '.');
+      const comissao = document
+        .getElementById('serviceCommission')
+        .value.replace(/\./g, '')
         .replace(',', '.');
       const formData = new FormData();
       formData.append('nome', nome);
@@ -1093,9 +959,9 @@ document.addEventListener('DOMContentLoaded', function () {
           if (data.success) {
             showSnackbar('Serviço adicionado com sucesso!', 'success');
             closeAllModals();
-            serviceName.value = '';
-            servicePrice.value = '';
-            serviceCommission.value = '';
+            document.getElementById('serviceName').value = '';
+            document.getElementById('servicePrice').value = '';
+            document.getElementById('serviceCommission').value = '';
             carregarServicos();
             fillSelectOptions();
           } else {
@@ -1117,20 +983,23 @@ document.addEventListener('DOMContentLoaded', function () {
       .then((res) => res.json())
       .then((data) => {
         const osTableBody = document.getElementById('osTableBody');
+        if (!osTableBody) return;
         osTableBody.innerHTML = '';
         if (data && Array.isArray(data) && data.length > 0) {
           data.forEach((os) => {
             function formatarDataHora(dataStr) {
               if (!dataStr) return '-';
-              const partes = dataStr.split(' ');
-              const data = partes[0] ? partes[0].split('-') : [];
-              const hora = partes[1] ? partes[1].slice(0, 5) : '';
-              if (data.length === 3) {
-                return `${data[2]}/${data[1]}/${data[0]}${
-                  hora ? ' ' + hora : ''
-                }`;
-              }
-              return '-';
+              const dataObj = new Date(dataStr);
+              if (isNaN(dataObj.getTime())) return '-';
+              return dataObj
+                .toLocaleString('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+                .replace(' ', ' às ');
             }
 
             function getStatusBadge(status) {
@@ -1150,18 +1019,10 @@ document.addEventListener('DOMContentLoaded', function () {
               return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${styleClass}">${status}</span>`;
             }
             let valor = '-';
-            let valorNum =
-              os.valor_total !== undefined && os.valor_total !== null
-                ? os.valor_total
-                : os.valor;
-            if (
-              valorNum !== undefined &&
-              valorNum !== null &&
-              !isNaN(parseFloat(valorNum))
-            ) {
+            if (os.valor_total != null && !isNaN(parseFloat(os.valor_total))) {
               valor =
                 'R$ ' +
-                parseFloat(valorNum).toLocaleString('pt-BR', {
+                parseFloat(os.valor_total).toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
                 });
             }
@@ -1169,31 +1030,30 @@ document.addEventListener('DOMContentLoaded', function () {
             tr.className =
               'os-row transition-all duration-200 hover:bg-dark-elevated hover:bg-opacity-30';
             tr.innerHTML = `
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
-                os.numero_os || '-'
-              }</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
-                os.cliente
-              }</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
-                os.item
-              }</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${formatarDataHora(
-                os.data_entrada
-              )}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${formatarDataHora(
-                os.data_atualizacao
-              )}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${getStatusBadge(
-                os.status
-              )}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${valor}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
-                  <button class="btn-editar-os text-accent-blue hover:underline" data-id="${
-                    os.id
-                  }">Editar</button>
-              </td>
-            `;
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
+                          os.numero_os || '-'
+                        }</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
+                          os.cliente
+                        }</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${
+                          os.item
+                        }</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${formatarDataHora(
+                          os.data_entrada
+                        )}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${formatarDataHora(
+                          os.data_atualizacao
+                        )}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${getStatusBadge(
+                          os.status
+                        )}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">${valor}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                            <button class="btn-editar-os text-accent-blue hover:underline" data-id="${
+                              os.id
+                            }">Editar</button>
+                        </td>`;
             osTableBody.appendChild(tr);
           });
         } else {
@@ -1208,18 +1068,12 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .catch(() => {
         const osTableBody = document.getElementById('osTableBody');
-        osTableBody.innerHTML =
-          '<tr><td colspan="8" class="text-center text-red-400 py-4">Erro ao carregar OS.</td></tr>';
+        if (osTableBody)
+          osTableBody.innerHTML =
+            '<tr><td colspan="8" class="text-center text-red-400 py-4">Erro ao carregar OS.</td></tr>';
       });
   }
-
-  function formatarData(dataStr) {
-    if (!dataStr) return '';
-    const [ano, mes, dia] = dataStr.split('-');
-    return `${dia}/${mes}/${ano}`;
-  }
   carregarChamados();
-  let osEditandoId = null;
 
   function abrirModalEditarOS(id) {
     fetch('chamados_select.php')
@@ -1235,50 +1089,22 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editAttendant').value = os.atendente || '';
         document.getElementById('editPhone').value = os.telefone || '';
         document.getElementById('editItem').value = os.item || '';
-        document.getElementById('editEntryDate').value = os.data_entrada || '';
-        document.getElementById('editExitDate').value = os.data_saida || '';
+        const formatDate = (dateStr) => (dateStr ? dateStr.split(' ')[0] : '');
+        document.getElementById('editEntryDate').value = formatDate(
+          os.data_entrada
+        );
+        document.getElementById('editExitDate').value = formatDate(
+          os.data_saida
+        );
         document.getElementById('editDefectSolution').value =
           os.defeito_solucao || '';
-        fetch('servicos_select.php')
-          .then((res) => res.json())
-          .then((servicos) => {
-            const selectServicoEditar = document.getElementById(
-              'selectServicoEditar'
-            );
-            selectServicoEditar.innerHTML = '';
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = 'Selecione um serviço';
-            selectServicoEditar.appendChild(opt);
-            servicos.forEach((s) => {
-              const o = document.createElement('option');
-              o.value = s.id;
-              o.textContent = s.nome;
-              if (String(s.id) === String(os.servico_id)) o.selected = true;
-              selectServicoEditar.appendChild(o);
-            });
-          });
-        const statusList = [
-          'Diagnosticando',
-          'Aguardando Cliente',
-          'Aguardando Peça',
-          'Aguardando Retirada',
-          'Concluído',
-        ];
-        const selectStatusEditar =
-          document.getElementById('selectStatusEditar');
-        selectStatusEditar.innerHTML = '';
-        statusList.forEach((s) => {
-          const o = document.createElement('option');
-          o.value = s;
-          o.textContent = s;
-          if (s === os.status) o.selected = true;
-          selectStatusEditar.appendChild(o);
-        });
+        const selectServicoEditar = document.getElementById(
+          'selectServicoEditar'
+        );
+        selectServicoEditar.value = os.servico_id || '';
+        document.getElementById('selectStatusEditar').value = os.status || '';
         document.getElementById('valorTotalEditar').value =
-          os.valor_total !== undefined &&
-          os.valor_total !== null &&
-          !isNaN(parseFloat(os.valor_total))
+          os.valor_total != null
             ? parseFloat(os.valor_total).toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
               })
@@ -1303,42 +1129,29 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         return;
       }
-      const numero_os = document
-        .getElementById('editOsNumber')
-        .textContent.replace('#', '')
-        .trim();
-      const cliente = document.getElementById('editClientName').value.trim();
-      const atendente = document.getElementById('editAttendant').value.trim();
-      const telefone = document.getElementById('editPhone').value.trim();
-      const item = document.getElementById('editItem').value.trim();
-      const data_entrada = document.getElementById('editEntryDate').value;
-      const data_saida = document.getElementById('editExitDate').value;
-      const defeito_solucao = document
-        .getElementById('editDefectSolution')
-        .value.trim();
-      const servico_id = document.getElementById('selectServicoEditar').value;
-      const tipo_recebimento = document.getElementById(
-        'selectRecebimentoEditar'
-      ).value;
-      const valor_total = document
-        .getElementById('valorTotalEditar')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      const status = document.getElementById('selectStatusEditar').value;
       const payload = {
         id: osEditandoId,
-        numero_os,
-        cliente,
-        atendente,
-        telefone,
-        item,
-        data_entrada,
-        data_saida,
-        defeito_solucao,
-        servico_id,
-        tipo_recebimento,
-        valor_total,
-        status,
+        numero_os: document
+          .getElementById('editOsNumber')
+          .textContent.replace('#', '')
+          .trim(),
+        cliente: document.getElementById('editClientName').value.trim(),
+        atendente: document.getElementById('editAttendant').value.trim(),
+        telefone: document.getElementById('editPhone').value.trim(),
+        item: document.getElementById('editItem').value.trim(),
+        data_entrada: document.getElementById('editEntryDate').value,
+        data_saida: document.getElementById('editExitDate').value,
+        defeito_solucao: document
+          .getElementById('editDefectSolution')
+          .value.trim(),
+        servico_id: document.getElementById('selectServicoEditar').value,
+        tipo_recebimento: document.getElementById('selectRecebimentoEditar')
+          .value,
+        valor_total: document
+          .getElementById('valorTotalEditar')
+          .value.replace(/\./g, '')
+          .replace(',', '.'),
+        status: document.getElementById('selectStatusEditar').value,
       };
       fetch('chamados_update.php', {
         method: 'POST',
@@ -1409,37 +1222,22 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         return;
       }
-      const numero_os = document.getElementById('osNumber').value.trim();
-      const cliente = document.getElementById('clientName').value.trim();
-      const atendente = document.getElementById('attendant').value.trim();
-      const telefone = document.getElementById('phone').value.trim();
-      const item = document.getElementById('item').value.trim();
-      const data_entrada = document.getElementById('entryDate').value;
-      const data_saida = document.getElementById('exitDate').value;
-      const defeito_solucao = document
-        .getElementById('defectSolution')
-        .value.trim();
-      const servico_id = document.getElementById('selectServico').value;
-      const tipo_recebimento =
-        document.getElementById('selectRecebimento').value;
-      const valor_total = document
-        .getElementById('valorTotal')
-        .value.replace(/\./g, '')
-        .replace(',', '.');
-      const status = document.getElementById('selectStatus').value;
       const payload = {
-        numero_os,
-        cliente,
-        atendente,
-        telefone,
-        item,
-        data_entrada,
-        data_saida,
-        defeito_solucao,
-        servico_id,
-        tipo_recebimento,
-        valor_total,
-        status,
+        numero_os: document.getElementById('osNumber').value.trim(),
+        cliente: document.getElementById('clientName').value.trim(),
+        atendente: document.getElementById('attendant').value.trim(),
+        telefone: document.getElementById('phone').value.trim(),
+        item: document.getElementById('item').value.trim(),
+        data_entrada: document.getElementById('entryDate').value,
+        data_saida: document.getElementById('exitDate').value,
+        defeito_solucao: document.getElementById('defectSolution').value.trim(),
+        servico_id: document.getElementById('selectServico').value,
+        tipo_recebimento: document.getElementById('selectRecebimento').value,
+        valor_total: document
+          .getElementById('valorTotal')
+          .value.replace(/\./g, '')
+          .replace(',', '.'),
+        status: document.getElementById('selectStatus').value,
       };
       fetch('chamados_insert.php', {
         method: 'POST',
@@ -1472,36 +1270,19 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!snackbar) {
       snackbar = document.createElement('div');
       snackbar.id = 'snackbarCustom';
-      snackbar.style.position = 'fixed';
-      snackbar.style.bottom = '32px';
-      snackbar.style.left = '50%';
-      snackbar.style.transform = 'translateX(-50%)';
-      snackbar.style.minWidth = '240px';
-      snackbar.style.maxWidth = '90vw';
-      snackbar.style.padding = '16px 32px';
-      snackbar.style.borderRadius = '8px';
-      snackbar.style.fontSize = '1rem';
-      snackbar.style.fontWeight = 'bold';
-      snackbar.style.zIndex = '9999';
-      snackbar.style.boxShadow = '0 2px 16px rgba(0,0,0,0.2)';
-      snackbar.style.textAlign = 'center';
-      snackbar.style.opacity = '0';
-      snackbar.style.pointerEvents = 'none';
+      snackbar.style.cssText =
+        'position:fixed; bottom:32px; left:50%; transform:translateX(-50%); min-width:240px; max-width:90vw; padding:16px 32px; border-radius:8px; font-size:1rem; font-weight:bold; z-index:9999; box-shadow:0 2px 16px rgba(0,0,0,0.2); text-align:center; opacity:0; pointer-events:none; transition:opacity 0.3s;';
       document.body.appendChild(snackbar);
     }
-    let bg = '#2196f3',
-      color = '#fff';
-    if (type === 'success') {
-      bg = '#22c55e';
-    } else if (type === 'error') {
-      bg = '#ef4444';
-    } else if (type === 'warning') {
-      bg = '#f59e42';
-    }
-    snackbar.style.background = bg;
-    snackbar.style.color = color;
+    const colors = {
+      success: '#22c55e',
+      error: '#ef4444',
+      warning: '#f59e42',
+      info: '#2196f3',
+    };
+    snackbar.style.background = colors[type] || colors.info;
+    snackbar.style.color = '#fff';
     snackbar.textContent = message;
-    snackbar.style.transition = 'opacity 0.3s';
     snackbar.style.opacity = '1';
     setTimeout(() => {
       snackbar.style.opacity = '0';
