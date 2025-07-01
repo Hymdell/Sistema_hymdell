@@ -260,16 +260,34 @@ document.addEventListener('DOMContentLoaded', function () {
   function validateOSForm(isEdit = false) {
     const errors = [];
     const getElValue = (id) => {
-      const el = document.getElementById(isEdit ? `edit${id}` : id);
+      const el = document.getElementById(id);
       return el ? el.value.trim() : '';
     };
-    if (!getElValue('ClientName'))
-      errors.push('Nome do Cliente é obrigatório.');
-    if (!getElValue('Attendant')) errors.push('Atendente é obrigatório.');
-    if (!getElValue('Item')) errors.push('Item é obrigatório.');
-    if (!getElValue('EntryDate')) errors.push('Data de Entrada é obrigatória.');
-    if (!getElValue('DefectSolution'))
+
+    // Campos básicos
+    const clientName = isEdit ? 'editClientName' : 'clientName';
+    const attendant = isEdit ? 'editAttendant' : 'attendant';
+    const item = isEdit ? 'editItem' : 'item';
+    const entryDate = isEdit ? 'editEntryDate' : 'entryDate';
+    const defectSolution = isEdit ? 'editDefectSolution' : 'defectSolution';
+
+    if (!getElValue(clientName)) errors.push('Nome do Cliente é obrigatório.');
+    if (!getElValue(attendant)) errors.push('Atendente é obrigatório.');
+    if (!getElValue(item)) errors.push('Item é obrigatório.');
+    if (!getElValue(entryDate)) errors.push('Data de Entrada é obrigatória.');
+    if (!getElValue(defectSolution))
       errors.push('Defeito/Solução é obrigatório.');
+
+    // Validações adicionais para campos obrigatórios no backend
+    const statusSelect = isEdit ? 'selectStatusEditar' : 'selectStatus';
+    const recebimentoSelect = isEdit
+      ? 'selectRecebimentoEditar'
+      : 'selectRecebimento';
+
+    if (!getElValue(statusSelect)) errors.push('Status é obrigatório.');
+    if (!getElValue(recebimentoSelect))
+      errors.push('Tipo de Recebimento é obrigatório.');
+
     return errors;
   }
 
@@ -631,24 +649,33 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function handleGenericFetch(url, options, successMessage, errorMessage) {
+    console.log('Enviando requisição para:', url);
+    console.log('Opções da requisição:', options);
+
     return fetch(url, options)
       .then((response) => {
+        console.log('Status da resposta:', response.status);
         if (response.ok) {
           return response.text();
         }
         throw new Error('Falha na resposta da rede.');
       })
       .then((text) => {
+        console.log('Resposta do servidor:', text);
         try {
           const data = JSON.parse(text);
+          console.log('Dados parseados:', data);
           if (data.success === false)
             throw new Error(data.error || errorMessage);
-        } catch (e) {}
+        } catch (e) {
+          console.log('Erro ao parsear JSON:', e);
+        }
         showSnackbar(successMessage, 'success');
         closeAllModals();
         carregarDadosIniciais();
       })
       .catch((err) => {
+        console.error('Erro na requisição:', err);
         showSnackbar(err.message || errorMessage, 'error');
       });
   }
@@ -1027,6 +1054,14 @@ document.addEventListener('DOMContentLoaded', function () {
         .replace(',', '.'),
       status: document.getElementById('selectStatus').value,
     };
+
+    // Debug log para verificar os dados
+    console.log('Payload sendo enviado:', payload);
+    console.log(
+      'Campos vazios:',
+      Object.entries(payload).filter(([key, value]) => !value)
+    );
+
     handleGenericFetch(
       '../backend/chamados/chamados_insert.php',
       {
